@@ -10,22 +10,33 @@ class UrlHelper
     public static function getBaseUrl(): string
     {
         if (self::$baseUrl === null) {
-            $config = require dirname(__DIR__, 2) . '/config/config.php';
-            $configuredUrl = rtrim((string) ($config['app']['url'] ?? ''), '/');
-
-            // If running in web browser with HTTP_HOST
+            // 1. Jika diakses lewat web browser, SELALU gunakan host/domain aktif dari browser
             if (!empty($_SERVER['HTTP_HOST'])) {
-                // If APP_URL is explicitly configured to a real domain (not default localhost), use it
-                if (!empty($configuredUrl) && !str_contains($configuredUrl, 'localhost')) {
-                    self::$baseUrl = $configuredUrl;
+                $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                    || (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
+                    || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+                    ? 'https' : 'http';
+
+                $host = $_SERVER['HTTP_HOST'];
+
+                // Deteksi subfolder jika aplikasi ditaruh di dalam subdirektori (misal: /toko/)
+                $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+                $dir = str_replace('\\', '/', dirname($scriptName));
+                if (str_contains($dir, ':') || $dir === '.' || $dir === '/') {
+                    $basePath = '';
                 } else {
-                    // Auto-detect protocol and current host dynamically (e.g. gambiran.bumdes13.id)
-                    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-                        ? 'https' : 'http';
-                    self::$baseUrl = "{$protocol}://{$_SERVER['HTTP_HOST']}";
+                    $basePath = rtrim($dir, '/');
+                    if (str_ends_with($basePath, '/public')) {
+                        $basePath = substr($basePath, 0, -7);
+                    }
                 }
+
+                self::$baseUrl = "{$protocol}://{$host}{$basePath}";
             } else {
+                // 2. Fallback untuk CLI / Console
+                $config = require dirname(__DIR__, 2) . '/config/config.php';
+                $configuredUrl = rtrim((string) ($config['app']['url'] ?? ''), '/');
                 self::$baseUrl = !empty($configuredUrl) ? $configuredUrl : 'http://localhost:8000';
             }
         }
@@ -50,8 +61,13 @@ class UrlHelper
             return self::base($fallback);
         }
 
-        // If absolute URL is stored
+        // Jika tersimpan URL absolut dari domain lama atau localhost, konversi otomatis ke domain aktif
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            $parsed = parse_url($path);
+            if (!empty($parsed['path']) && str_contains($parsed['path'], '/uploads/')) {
+                $subPath = substr($parsed['path'], strpos($parsed['path'], '/uploads/') + 9);
+                return self::base('uploads/' . ltrim($subPath, '/'));
+            }
             return $path;
         }
 

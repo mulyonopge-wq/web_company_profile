@@ -24,9 +24,9 @@ $companyWa = $settings['company_whatsapp'] ?? '081234567890';
         </div>
         <div class="carousel-inner">
             <?php foreach ($banners as $idx => $b): ?>
-                <div class="carousel-item <?= $idx === 0 ? 'active' : '' ?>">
+                <div class="carousel-item <?= $idx === 0 ? 'active' : '' ?>" style="height: 480px; background-color: #101827; position: relative;">
                     <?php if (!empty($b['image'])): ?>
-                        <img src="<?= UrlHelper::upload($b['image']) ?>" alt="<?= e($b['title']) ?>">
+                        <img src="<?= UrlHelper::upload($b['image']) ?>" alt="<?= e($b['title']) ?>" style="height: 100%; width: 100%; object-fit: cover; opacity: 0.35;">
                     <?php else: ?>
                         <div class="w-100 h-100" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);"></div>
                     <?php endif; ?>

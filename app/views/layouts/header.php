@@ -74,7 +74,7 @@ $favicon = !empty($settings['site_favicon']) ? UrlHelper::upload($settings['site
 </div>
 
 <!-- Main Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark main-navbar sticky-top shadow-sm py-2">
+<nav class="navbar navbar-expand-lg navbar-dark main-navbar sticky-top shadow-sm py-2" style="background-color: #0f172a !important; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center gap-2" href="<?= UrlHelper::base() ?>">
             <?php if ($logo): ?>
