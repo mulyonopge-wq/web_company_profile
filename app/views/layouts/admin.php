@@ -86,6 +86,11 @@ $companyName = $settings['company_name'] ?? 'Admin Panel';
                 <i class="bi bi-camera"></i> Galeri Foto
             </a>
 
+            <div class="sidebar-heading">Sistem & Pembaruan</div>
+            <a href="<?= UrlHelper::base('admin/update') ?>" class="sidebar-link <?= UrlHelper::isActive('admin/update') ?>">
+                <i class="bi bi-github"></i> Update dari GitHub
+            </a>
+
             <div class="sidebar-heading">Pengaturan Akun</div>
             <a href="<?= UrlHelper::base('admin/users') ?>" class="sidebar-link <?= UrlHelper::isActive('admin/users') ?>">
                 <i class="bi bi-person-badge"></i> Pengguna Admin

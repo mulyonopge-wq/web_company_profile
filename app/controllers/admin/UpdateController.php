@@ -1,0 +1,222 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Controllers\Admin;
+
+use App\Helpers\CsrfHelper;
+use App\Helpers\FlashHelper;
+use App\Helpers\UrlHelper;
+
+class UpdateController extends AdminBaseController
+{
+    private string $repoPath;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->repoPath = dirname(__DIR__, 3);
+    }
+
+    public function index(): void
+    {
+        $execAllowed = $this->isExecEnabled();
+        $gitInfo = [
+            'installed' => false,
+            'version' => '',
+            'branch' => 'main',
+            'current_commit' => '',
+            'current_tag' => '',
+            'remote_url' => '',
+            'status' => '',
+            'behind_count' => 0,
+            'commits_behind' => [],
+            'has_uncommitted' => false,
+        ];
+
+        $outputLog = $_SESSION['update_log'] ?? null;
+        unset($_SESSION['update_log']);
+
+        if ($execAllowed) {
+            $gitVer = $this->runCommand('git --version');
+            if ($gitVer['success'] && !empty($gitVer['output'])) {
+                $gitInfo['installed'] = true;
+                $gitInfo['version'] = trim($gitVer['output']);
+
+                // Current branch
+                $branchCmd = $this->runCommand('git rev-parse --abbrev-ref HEAD');
+                $gitInfo['branch'] = trim($branchCmd['output'] ?: 'main');
+
+                // Current commit
+                $commitCmd = $this->runCommand('git log -1 --format="%h - %s (%cr)"');
+                $gitInfo['current_commit'] = trim($commitCmd['output'] ?: '-');
+
+                // Current tag
+                $tagCmd = $this->runCommand('git describe --tags --always');
+                $gitInfo['current_tag'] = trim($tagCmd['output'] ?: '-');
+
+                // Remote URL
+                $remoteCmd = $this->runCommand('git remote get-url origin');
+                $gitInfo['remote_url'] = trim($remoteCmd['output'] ?: '-');
+
+                // Check local changes
+                $statusCmd = $this->runCommand('git status --porcelain');
+                $gitInfo['status'] = trim($statusCmd['output']);
+                $gitInfo['has_uncommitted'] = !empty($gitInfo['status']);
+            }
+        }
+
+        $this->renderView('admin/update/index', [
+            'title' => 'Update dari GitHub',
+            'execAllowed' => $execAllowed,
+            'gitInfo' => $gitInfo,
+            'outputLog' => $outputLog,
+        ], 'layouts/admin');
+    }
+
+    public function check(): void
+    {
+        CsrfHelper::verify();
+
+        if (!$this->isExecEnabled()) {
+            FlashHelper::danger('Fungsi shell_exec / exec dinonaktifkan di konfigurasi PHP server.');
+            UrlHelper::redirect('/admin/update');
+            return;
+        }
+
+        // Fetch updates from origin
+        $fetch = $this->runCommand('git fetch origin main 2>&1');
+        
+        // Count commits behind
+        $countCmd = $this->runCommand('git rev-list HEAD..origin/main --count');
+        $count = (int) trim($countCmd['output'] ?: '0');
+
+        if ($count > 0) {
+            $logCmd = $this->runCommand('git log HEAD..origin/main --oneline');
+            $_SESSION['update_log'] = [
+                'type' => 'info',
+                'title' => "Tersedia {$count} pembaruan baru dari GitHub!",
+                'command' => 'git fetch origin main',
+                'output' => $logCmd['output'] ?: 'Ada pembaruan siap ditarik.',
+            ];
+            FlashHelper::info("Ditemukan {$count} commit pembaruan baru di GitHub. Silakan klik tombol 'Tarik Pembaruan'.");
+        } else {
+            $_SESSION['update_log'] = [
+                'type' => 'success',
+                'title' => 'Aplikasi sudah menggunakan versi terbaru dari GitHub!',
+                'command' => 'git fetch origin main',
+                'output' => "Status: Up-to-date with origin/main.\nTidak ada pembaruan baru yang ditemukan.",
+            ];
+            FlashHelper::success('Aplikasi Anda sudah mutakhir (Up-to-date) dengan versi GitHub!');
+        }
+
+        UrlHelper::redirect('/admin/update');
+    }
+
+    public function pull(): void
+    {
+        CsrfHelper::verify();
+
+        if (!$this->isExecEnabled()) {
+            FlashHelper::danger('Fungsi shell_exec / exec dinonaktifkan di konfigurasi PHP server.');
+            UrlHelper::redirect('/admin/update');
+            return;
+        }
+
+        // Run git pull origin main
+        $result = $this->runCommand('git pull origin main 2>&1');
+
+        $_SESSION['update_log'] = [
+            'type' => $result['success'] ? 'success' : 'danger',
+            'title' => $result['success'] ? 'Proses Git Pull Berhasil!' : 'Proses Git Pull Mengalami Kendala',
+            'command' => 'git pull origin main',
+            'output' => $result['output'],
+        ];
+
+        if ($result['success']) {
+            FlashHelper::success('Pembaruan dari GitHub berhasil ditarik dan diterapkan ke aplikasi!');
+        } else {
+            FlashHelper::warning('Git pull gagal diterapkan. Jika terjadi konflik file lokal, gunakan opsi "Reset Paksa ke Versi GitHub".');
+        }
+
+        UrlHelper::redirect('/admin/update');
+    }
+
+    public function resetHard(): void
+    {
+        CsrfHelper::verify();
+
+        if (!$this->isExecEnabled()) {
+            FlashHelper::danger('Fungsi shell_exec / exec dinonaktifkan di konfigurasi PHP server.');
+            UrlHelper::redirect('/admin/update');
+            return;
+        }
+
+        // Fetch then hard reset to origin/main (keeps untracked files like .env and uploads safe)
+        $fetch = $this->runCommand('git fetch origin main 2>&1');
+        $reset = $this->runCommand('git reset --hard origin/main 2>&1');
+
+        $combinedOutput = "--- GIT FETCH ---\n" . $fetch['output'] . "\n\n--- GIT RESET HARD ---\n" . $reset['output'];
+
+        $_SESSION['update_log'] = [
+            'type' => $reset['success'] ? 'success' : 'danger',
+            'title' => $reset['success'] ? 'Reset Paksa ke Versi GitHub Berhasil!' : 'Gagal Melakukan Reset Paksa',
+            'command' => 'git fetch origin main && git reset --hard origin/main',
+            'output' => $combinedOutput,
+        ];
+
+        if ($reset['success']) {
+            FlashHelper::success('Kode program berhasil disinkronkan 100% dengan GitHub repository (file .env & folder upload tetap aman)!');
+        } else {
+            FlashHelper::danger('Gagal melakukan reset paksa. Silakan cek pesan log terminal di bawah.');
+        }
+
+        UrlHelper::redirect('/admin/update');
+    }
+
+    private function isExecEnabled(): bool
+    {
+        if (!function_exists('shell_exec') && !function_exists('exec')) {
+            return false;
+        }
+
+        $disabled = explode(',', (string) ini_get('disable_functions'));
+        $disabled = array_map('trim', $disabled);
+
+        return !in_array('shell_exec', $disabled) && !in_array('exec', $disabled);
+    }
+
+    private function runCommand(string $command): array
+    {
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open($command, $descriptors, $pipes, $this->repoPath);
+
+        if (!is_resource($process)) {
+            // Fallback to shell_exec
+            if (function_exists('shell_exec')) {
+                $output = shell_exec("cd /D \"{$this->repoPath}\" && {$command} 2>&1") ?: '';
+                return ['success' => true, 'output' => $output];
+            }
+            return ['success' => false, 'output' => 'Tidak dapat menjalankan command shell.'];
+        }
+
+        fclose($pipes[0]);
+        $stdout = stream_get_contents($pipes[1]) ?: '';
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]) ?: '';
+        fclose($pipes[2]);
+
+        $exitCode = proc_close($process);
+        $output = trim($stdout . ($stderr ? "\n" . $stderr : ''));
+
+        return [
+            'success' => ($exitCode === 0),
+            'output' => $output,
+            'exitCode' => $exitCode,
+        ];
+    }
+}

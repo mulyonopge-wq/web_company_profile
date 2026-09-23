@@ -118,3 +118,10 @@ Router::post('/admin/users/store', 'Admin\UserController@store');
 Router::get('/admin/users/edit/{id}', 'Admin\UserController@edit');
 Router::post('/admin/users/update/{id}', 'Admin\UserController@update');
 Router::post('/admin/users/delete/{id}', 'Admin\UserController@delete');
+
+// System & GitHub Updates
+Router::get('/admin/update', 'Admin\UpdateController@index');
+Router::post('/admin/update/check', 'Admin\UpdateController@check');
+Router::post('/admin/update/pull', 'Admin\UpdateController@pull');
+Router::post('/admin/update/reset', 'Admin\UpdateController@resetHard');
+
