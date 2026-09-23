@@ -116,6 +116,7 @@ Router::post('/admin/articles/store', 'Admin\ArticleController@store');
 Router::get('/admin/articles/edit/{id}', 'Admin\ArticleController@edit');
 Router::post('/admin/articles/update/{id}', 'Admin\ArticleController@update');
 Router::post('/admin/articles/delete/{id}', 'Admin\ArticleController@delete');
+Router::post('/admin/articles/settings', 'Admin\ArticleController@updateSettings');
 
 // Galleries
 Router::get('/admin/galleries', 'Admin\GalleryController@index');

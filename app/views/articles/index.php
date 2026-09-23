@@ -1,6 +1,11 @@
 <?php
 use App\Helpers\Sanitizer;
 use App\Helpers\UrlHelper;
+use App\Models\Setting;
+
+$badge = $articleBadge ?? (class_exists('App\Models\Setting') ? Setting::get('article_page_badge', 'Pusat Edukasi & Berita') : 'Pusat Edukasi & Berita');
+$pageTitle = $articleTitle ?? (class_exists('App\Models\Setting') ? Setting::get('article_page_title', 'Artikel & Tips Teknologi Jaringan') : 'Artikel & Tips Teknologi Jaringan');
+$pageSubtitle = $articleSubtitle ?? (class_exists('App\Models\Setting') ? Setting::get('article_page_subtitle', 'Dapatkan wawasan seputar konfigurasi router, optimasi bandwidth kantor, keamanan jaringan, dan ulasan perangkat IT terbaru.') : 'Dapatkan wawasan seputar konfigurasi router, optimasi bandwidth kantor, keamanan jaringan, dan ulasan perangkat IT terbaru.');
 ?>
 
 <!-- Breadcrumb -->
@@ -17,11 +22,15 @@ use App\Helpers\UrlHelper;
 
 <div class="container pb-5">
     <div class="text-center mb-5">
-        <span class="badge text-bg-primary px-3 py-2 rounded-pill mb-2">Pusat Edukasi & Berita</span>
-        <h1 class="fw-bold text-dark">Artikel & Tips Teknologi Jaringan</h1>
-        <p class="text-secondary mx-auto" style="max-width: 600px;">
-            Dapatkan wawasan seputar konfigurasi router, optimasi bandwidth kantor, keamanan jaringan, dan ulasan perangkat IT terbaru.
-        </p>
+        <?php if (!empty($badge)): ?>
+            <span class="badge text-bg-primary px-3 py-2 rounded-pill mb-2"><?= e($badge) ?></span>
+        <?php endif; ?>
+        <h1 class="fw-bold text-dark"><?= e($pageTitle) ?></h1>
+        <?php if (!empty($pageSubtitle)): ?>
+            <p class="text-secondary mx-auto" style="max-width: 600px;">
+                <?= nl2br(e($pageSubtitle)) ?>
+            </p>
+        <?php endif; ?>
     </div>
 
     <?php if (empty($articles)): ?>

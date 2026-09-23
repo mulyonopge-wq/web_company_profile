@@ -8,15 +8,23 @@ use App\Helpers\FlashHelper;
 use App\Helpers\Sanitizer;
 use App\Helpers\UrlHelper;
 use App\Models\Article;
+use App\Models\Setting;
 
 class ArticleController extends AdminBaseController
 {
     public function index(): void
     {
         $articles = Article::all();
+        $articleBadge = Setting::get('article_page_badge', 'Pusat Edukasi & Berita');
+        $articleTitle = Setting::get('article_page_title', 'Artikel & Tips Teknologi Jaringan');
+        $articleSubtitle = Setting::get('article_page_subtitle', 'Dapatkan wawasan seputar konfigurasi router, optimasi bandwidth kantor, keamanan jaringan, dan ulasan perangkat IT terbaru.');
+
         $this->renderAdminView('admin/articles/index', [
             'title' => 'Kelola Artikel & Berita',
             'articles' => $articles,
+            'articleBadge' => $articleBadge,
+            'articleTitle' => $articleTitle,
+            'articleSubtitle' => $articleSubtitle,
         ]);
     }
 
@@ -155,6 +163,24 @@ class ArticleController extends AdminBaseController
             FlashHelper::success('Artikel berhasil dihapus.');
         }
 
+        UrlHelper::redirect('/admin/articles');
+    }
+
+    public function updateSettings(): void
+    {
+        $badge = trim($_POST['article_page_badge'] ?? '');
+        $title = trim($_POST['article_page_title'] ?? '');
+        $subtitle = trim($_POST['article_page_subtitle'] ?? '');
+
+        if (!empty($badge)) {
+            Setting::set('article_page_badge', $badge, 'articles');
+        }
+        if (!empty($title)) {
+            Setting::set('article_page_title', $title, 'articles');
+        }
+        Setting::set('article_page_subtitle', $subtitle, 'articles');
+
+        FlashHelper::success('Judul dan kata-kata halaman artikel berhasil diperbarui.');
         UrlHelper::redirect('/admin/articles');
     }
 }

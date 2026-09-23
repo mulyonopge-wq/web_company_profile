@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Models\Article;
+use App\Models\Setting;
 
 class ArticleController extends BaseController
 {
@@ -11,8 +12,11 @@ class ArticleController extends BaseController
     {
         $articles = Article::getPublished();
         $this->renderView('articles/index', [
-            'title' => 'Artikel & Berita Terbaru',
+            'title' => Setting::get('article_page_title', 'Artikel & Tips Teknologi Jaringan'),
             'articles' => $articles,
+            'articleBadge' => Setting::get('article_page_badge', 'Pusat Edukasi & Berita'),
+            'articleTitle' => Setting::get('article_page_title', 'Artikel & Tips Teknologi Jaringan'),
+            'articleSubtitle' => Setting::get('article_page_subtitle', 'Dapatkan wawasan seputar konfigurasi router, optimasi bandwidth kantor, keamanan jaringan, dan ulasan perangkat IT terbaru.'),
         ]);
     }
 
