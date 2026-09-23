@@ -10,20 +10,68 @@ $hasDiscount = ($product['discount_price'] > 0);
 $discountPercent = $hasDiscount ? round((($product['price'] - $product['discount_price']) / $product['price']) * 100) : 0;
 $productUrl = UrlHelper::base('produk/' . $product['slug']);
 
-// Siapkan daftar seluruh gambar produk untuk preview & lightbox
-$productImagesList = [];
+// Siapkan daftar seluruh media produk (gambar & video) untuk preview & lightbox
+$productMediaList = [];
 if (!empty($product['main_image'])) {
-    $productImagesList[] = UrlHelper::upload($product['main_image']);
+    $productMediaList[] = [
+        'type' => 'image',
+        'url' => UrlHelper::upload($product['main_image']),
+        'thumb' => UrlHelper::upload($product['main_image']),
+        'title' => $product['name']
+    ];
 }
 if (!empty($galleryImages)) {
     foreach ($galleryImages as $gImg) {
         if (!empty($gImg['image_path'])) {
-            $productImagesList[] = UrlHelper::upload($gImg['image_path']);
+            $productMediaList[] = [
+                'type' => 'image',
+                'url' => UrlHelper::upload($gImg['image_path']),
+                'thumb' => UrlHelper::upload($gImg['image_path']),
+                'title' => $product['name']
+            ];
         }
     }
 }
-if (empty($productImagesList)) {
-    $productImagesList[] = UrlHelper::upload($product['main_image'], 'assets/images/no-image.png');
+if (empty($productMediaList)) {
+    $productMediaList[] = [
+        'type' => 'image',
+        'url' => UrlHelper::upload($product['main_image'], 'assets/images/no-image.png'),
+        'thumb' => UrlHelper::upload($product['main_image'], 'assets/images/no-image.png'),
+        'title' => $product['name']
+    ];
+}
+
+$hasVideo = !empty($product['video_url']) || !empty($product['video_file']);
+$videoMediaIndex = null;
+if (!empty($product['video_file'])) {
+    $videoMediaIndex = count($productMediaList);
+    $productMediaList[] = [
+        'type' => 'video_file',
+        'url' => UrlHelper::upload($product['video_file']),
+        'thumb' => !empty($product['main_image']) ? UrlHelper::upload($product['main_image']) : null,
+        'title' => 'Video: ' . $product['name']
+    ];
+}
+if (!empty($product['video_url'])) {
+    $ytEmbed = UrlHelper::getYoutubeEmbedUrl($product['video_url']);
+    $ytThumb = UrlHelper::getYoutubeThumbnailUrl($product['video_url']);
+    if ($videoMediaIndex === null) {
+        $videoMediaIndex = count($productMediaList);
+    }
+    $productMediaList[] = [
+        'type' => 'youtube',
+        'url' => $ytEmbed ?: $product['video_url'],
+        'raw_url' => $product['video_url'],
+        'thumb' => $ytThumb ?: (!empty($product['main_image']) ? UrlHelper::upload($product['main_image']) : null),
+        'title' => 'Video YouTube: ' . $product['name']
+    ];
+}
+
+$productImagesList = [];
+foreach ($productMediaList as $m) {
+    if ($m['type'] === 'image') {
+        $productImagesList[] = $m['url'];
+    }
 }
 ?>
 
@@ -51,8 +99,8 @@ if (empty($productImagesList)) {
         <!-- Images & Gallery -->
         <div class="col-lg-5">
             <div class="card border rounded-4 p-3 bg-white shadow-sm mb-3">
-                <div class="d-flex align-items-center justify-content-center position-relative product-main-img-box cursor-pointer" style="min-height: 340px; max-height: 400px; overflow: hidden; cursor: zoom-in;" onclick="openProductLightbox()" title="Klik untuk memperbesar gambar">
-                    <img id="mainProductView" src="<?= $productImagesList[0] ?>" alt="<?= e($product['name']) ?>" class="img-fluid object-fit-contain transition-all" style="max-height: 380px;">
+                <div class="d-flex align-items-center justify-content-center position-relative product-main-img-box cursor-pointer" style="min-height: 340px; max-height: 400px; overflow: hidden; cursor: zoom-in;" onclick="openProductLightbox()" title="Klik untuk memperbesar foto & video">
+                    <img id="mainProductView" src="<?= $productMediaList[0]['url'] ?>" alt="<?= e($product['name']) ?>" class="img-fluid object-fit-contain transition-all" style="max-height: 380px;">
                     <?php if ($hasDiscount): ?>
                         <span class="product-badge-discount">HEMAT <?= $discountPercent ?>%</span>
                     <?php endif; ?>
@@ -63,49 +111,33 @@ if (empty($productImagesList)) {
             </div>
 
             <!-- Thumbnail Carousel / Grid -->
-            <?php 
-            $hasVideo = !empty($product['video_url']) || !empty($product['video_file']);
-            ?>
-            <?php if (!empty($galleryImages) || $hasVideo): ?>
+            <?php if (count($productMediaList) > 1): ?>
                 <div class="d-flex gap-2 overflow-x-auto pb-2">
-                    <div class="border border-primary rounded-3 p-1 cursor-pointer thumb-item active" data-index="0" style="width: 70px; height: 70px; flex-shrink: 0;" onclick="changeMainImage(0)">
-                        <img src="<?= $productImagesList[0] ?>" class="w-100 h-100 object-fit-contain">
-                    </div>
-                    <?php if (!empty($galleryImages)): ?>
-                        <?php foreach ($galleryImages as $idx => $img): 
-                            $imgIdx = $idx + 1;
-                        ?>
-                            <div class="border rounded-3 p-1 cursor-pointer thumb-item" data-index="<?= $imgIdx ?>" style="width: 70px; height: 70px; flex-shrink: 0;" onclick="changeMainImage(<?= $imgIdx ?>)">
-                                <img src="<?= UrlHelper::upload($img['image_path']) ?>" class="w-100 h-100 object-fit-contain">
+                    <?php foreach ($productMediaList as $idx => $mItem): ?>
+                        <?php if ($mItem['type'] === 'image'): ?>
+                            <div class="border rounded-3 p-1 cursor-pointer thumb-item <?= $idx === 0 ? 'border-primary active' : '' ?>" data-index="<?= $idx ?>" style="width: 70px; height: 70px; flex-shrink: 0;" onclick="changeMainImage(<?= $idx ?>)">
+                                <img src="<?= $mItem['url'] ?>" class="w-100 h-100 object-fit-contain">
                             </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                    <?php if ($hasVideo): ?>
-                        <div class="border border-danger rounded-3 p-1 cursor-pointer thumb-item thumb-video position-relative" style="width: 70px; height: 70px; flex-shrink: 0;" onclick="openProductVideoModal()" title="Klik untuk memutar video di popup player">
-                            <div class="position-relative w-100 h-100 rounded-2 overflow-hidden bg-black">
-                                <?php 
-                                $ytThumb = !empty($product['video_url']) ? UrlHelper::getYoutubeThumbnailUrl($product['video_url']) : null;
-                                if ($ytThumb): 
-                                ?>
-                                    <img src="<?= e($ytThumb) ?>" class="w-100 h-100 object-fit-cover" alt="Video YouTube">
-                                <?php elseif (!empty($product['video_file'])): ?>
-                                    <video class="w-100 h-100 object-fit-cover video-thumb-preview" preload="metadata" muted playsinline style="pointer-events: none;">
-                                        <source src="<?= UrlHelper::upload($product['video_file']) ?>#t=0.5" type="video/mp4">
-                                    </video>
-                                <?php else: ?>
-                                    <img src="<?= UrlHelper::upload($product['main_image']) ?>" class="w-100 h-100 object-fit-cover opacity-75" alt="Video">
-                                <?php endif; ?>
+                        <?php else: ?>
+                            <div class="border border-danger rounded-3 p-1 cursor-pointer thumb-item thumb-video position-relative" data-index="<?= $idx ?>" style="width: 70px; height: 70px; flex-shrink: 0;" onclick="openProductLightbox(<?= $idx ?>)" title="Klik untuk memutar video di popup">
+                                <div class="position-relative w-100 h-100 rounded-2 overflow-hidden bg-black">
+                                    <?php if (!empty($mItem['thumb'])): ?>
+                                        <img src="<?= e($mItem['thumb']) ?>" class="w-100 h-100 object-fit-cover" alt="Video">
+                                    <?php else: ?>
+                                        <img src="<?= UrlHelper::upload($product['main_image']) ?>" class="w-100 h-100 object-fit-cover opacity-75" alt="Video">
+                                    <?php endif; ?>
 
-                                <!-- Video Overlay & Play Button -->
-                                <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-40 d-flex flex-column align-items-center justify-content-center">
-                                    <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 26px; height: 26px;">
-                                        <i class="bi bi-play-fill fs-5" style="margin-left: 2px;"></i>
+                                    <!-- Video Overlay & Play Button -->
+                                    <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-40 d-flex flex-column align-items-center justify-content-center">
+                                        <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 26px; height: 26px;">
+                                            <i class="bi bi-play-fill fs-5" style="margin-left: 2px;"></i>
+                                        </div>
+                                        <span class="badge bg-black bg-opacity-75 text-white px-1 py-0 mt-1" style="font-size: 0.55rem; letter-spacing: 0.5px;">VIDEO</span>
                                     </div>
-                                    <span class="badge bg-black bg-opacity-75 text-white px-1 py-0 mt-1" style="font-size: 0.55rem; letter-spacing: 0.5px;">VIDEO</span>
                                 </div>
                             </div>
-                        </div>
-                    <?php endif; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -374,17 +406,20 @@ if (empty($productImagesList)) {
 </div>
 <?php endif; ?>
 
-<!-- Modal Lightbox Pop-up Gambar Produk dengan Tombol Geser / Next -->
+<!-- Modal Lightbox Pop-up Gambar & Video Produk dengan Tombol Geser / Next -->
 <div class="modal fade modal-product-lightbox" id="productImageModal" tabindex="-1" aria-labelledby="productImageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-md-down">
         <div class="modal-content bg-dark border-0 shadow-2xl rounded-4 overflow-hidden position-relative" style="background-color: rgba(15, 20, 28, 0.96) !important; backdrop-filter: blur(12px);">
             <!-- Header Modal -->
             <div class="modal-header border-0 py-3 px-4 d-flex justify-content-between align-items-center bg-transparent">
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-primary px-3 py-2 rounded-pill font-monospace fs-6">
-                        <i class="bi bi-images me-1"></i> <span id="lightboxCurrentNum">1</span> / <span id="lightboxTotalNum"><?= count($productImagesList) ?></span>
+                        <i id="lightboxTypeIcon" class="bi bi-images me-1"></i> <span id="lightboxCurrentNum">1</span> / <span id="lightboxTotalNum"><?= count($productMediaList) ?></span>
                     </span>
-                    <h6 class="modal-title fw-bold text-white text-truncate mb-0" style="max-width: 420px;" id="productImageModalLabel">
+                    <span id="lightboxVideoBadge" class="badge bg-danger px-2 py-1 rounded-pill small d-none">
+                        <i class="bi bi-play-circle-fill me-1"></i> VIDEO
+                    </span>
+                    <h6 class="modal-title fw-bold text-white text-truncate mb-0 ms-2" style="max-width: 420px;" id="productImageModalLabel">
                         <?= e($product['name']) ?>
                     </h6>
                 </div>
@@ -395,40 +430,36 @@ if (empty($productImagesList)) {
                 </div>
             </div>
 
-            <!-- Body Modal (Gambar & Tombol Geser Kiri-Kanan) -->
-            <div class="modal-body p-0 d-flex align-items-center justify-content-center position-relative" style="min-height: 420px; max-height: 74vh; overflow: hidden; user-select: none;">
-                <?php if (count($productImagesList) > 1): ?>
+            <!-- Body Modal (Gambar/Video & Tombol Geser Kiri-Kanan) -->
+            <div class="modal-body p-0 d-flex align-items-center justify-content-center position-relative" style="min-height: 480px; max-height: 82vh; overflow: hidden; user-select: none;">
+                <?php if (count($productMediaList) > 1): ?>
                 <!-- Tombol Geser Kiri / Prev -->
-                <button type="button" class="btn-lightbox-nav btn-lightbox-prev position-absolute start-0 top-50 translate-middle-y ms-3 z-3 shadow" onclick="prevLightboxImage()" aria-label="Gambar Sebelumnya" title="Sebelumnya (Geser Kiri / Panah Kiri)">
+                <button type="button" class="btn-lightbox-nav btn-lightbox-prev position-absolute start-0 top-50 translate-middle-y ms-3 z-3 shadow" onclick="prevLightboxMedia()" aria-label="Sebelumnya" title="Sebelumnya (Geser Kiri / Panah Kiri)">
                     <i class="bi bi-chevron-left fs-3"></i>
                 </button>
                 <?php endif; ?>
 
                 <!-- Kontainer Gambar Pop-up -->
-                <div class="w-100 h-100 d-flex align-items-center justify-content-center p-3 text-center">
-                    <img id="lightboxImage" src="<?= $productImagesList[0] ?>" alt="<?= e($product['name']) ?>" class="img-fluid object-fit-contain shadow-sm" style="max-height: 70vh; max-width: 100%; border-radius: 12px; transition: transform 0.25s ease, opacity 0.2s ease;">
+                <div id="lightboxImageContainer" class="w-100 h-100 d-flex align-items-center justify-content-center p-3 text-center">
+                    <img id="lightboxImage" src="<?= $productMediaList[0]['url'] ?>" alt="<?= e($product['name']) ?>" class="img-fluid object-fit-contain shadow-sm" style="max-height: 76vh; max-width: 100%; border-radius: 12px; transition: opacity 0.2s ease;">
                 </div>
 
-                <?php if (count($productImagesList) > 1): ?>
+                <!-- Kontainer Video Pop-up -->
+                <div id="lightboxVideoContainer" class="w-100 h-100 d-none flex-column align-items-center justify-content-center p-3 text-center" style="max-width: 960px; margin: 0 auto;">
+                    <div class="ratio ratio-16x9 w-100 rounded-3 overflow-hidden bg-black shadow-lg">
+                        <video id="lightboxVideoPlayer" class="w-100 h-100 d-none" controls playsinline preload="metadata" style="object-fit: contain;"></video>
+                        <iframe id="lightboxYoutubePlayer" class="w-100 h-100 d-none" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <?php if (count($productMediaList) > 1): ?>
                 <!-- Tombol Geser Kanan / Next -->
-                <button type="button" class="btn-lightbox-nav btn-lightbox-next position-absolute end-0 top-50 translate-middle-y me-3 z-3 shadow" onclick="nextLightboxImage()" aria-label="Gambar Berikutnya" title="Berikutnya (Geser Kanan / Panah Kanan)">
+                <button type="button" class="btn-lightbox-nav btn-lightbox-next position-absolute end-0 top-50 translate-middle-y me-3 z-3 shadow" onclick="nextLightboxMedia()" aria-label="Berikutnya" title="Berikutnya (Geser Kanan / Panah Kanan)">
                     <i class="bi bi-chevron-right fs-3"></i>
                 </button>
                 <?php endif; ?>
             </div>
-
-            <!-- Footer Modal (Baris Thumbnail & Indikator) -->
-            <?php if (count($productImagesList) > 1): ?>
-            <div class="modal-footer border-0 py-3 px-4 justify-content-center bg-black bg-opacity-50">
-                <div class="d-flex gap-2 overflow-x-auto justify-content-center py-1" style="max-width: 100%;">
-                    <?php foreach ($productImagesList as $idx => $imgUrl): ?>
-                        <div class="lightbox-thumb border rounded-3 p-1 cursor-pointer <?= $idx === 0 ? 'border-primary active shadow' : 'border-secondary opacity-60' ?>" style="width: 58px; height: 58px; flex-shrink: 0; transition: all 0.2s;" onclick="setLightboxImage(<?= $idx ?>)">
-                            <img src="<?= $imgUrl ?>" class="w-100 h-100 object-fit-contain rounded-1" alt="Thumbnail <?= $idx + 1 ?>">
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <?php endif; ?>
+            <!-- Slide bar thumbnail dibawah foto dihapus sesuai permintaan -->
         </div>
     </div>
 </div>
@@ -464,20 +495,6 @@ if (empty($productImagesList)) {
 .btn-lightbox-nav:active {
     transform: translateY(-50%) scale(0.92);
 }
-.lightbox-thumb {
-    transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
-}
-.lightbox-thumb:hover {
-    opacity: 1 !important;
-    transform: scale(1.06);
-}
-.lightbox-thumb.active {
-    border-color: #0d6efd !important;
-    border-width: 2px !important;
-    opacity: 1 !important;
-    transform: scale(1.1);
-    box-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
-}
 @media (max-width: 768px) {
     .btn-lightbox-nav {
         width: 42px;
@@ -490,40 +507,39 @@ if (empty($productImagesList)) {
 </style>
 
 <script>
-const productImages = <?= json_encode($productImagesList) ?>;
-let currentImageIndex = 0;
+const productMedia = <?= json_encode($productMediaList) ?>;
+let currentMediaIndex = 0;
 
 function changeMainImage(index) {
     if (typeof index === 'string') {
-        const found = productImages.indexOf(index);
+        const found = productMedia.findIndex(m => m.url === index);
         index = found !== -1 ? found : 0;
     }
-    if (index < 0 || index >= productImages.length) return;
+    if (index < 0 || index >= productMedia.length) return;
     
-    currentImageIndex = index;
+    currentMediaIndex = index;
+    const item = productMedia[currentMediaIndex];
     const mainImg = document.getElementById('mainProductView');
-    if (mainImg) {
-        mainImg.src = productImages[currentImageIndex];
+    if (mainImg && item.type === 'image') {
+        mainImg.src = item.url;
     }
     
     // Highlight thumbnail aktif di halaman utama
-    document.querySelectorAll('.thumb-item').forEach((item) => {
-        if (!item.classList.contains('thumb-video')) {
-            const itemIdx = parseInt(item.getAttribute('data-index'));
-            if (itemIdx === currentImageIndex) {
-                item.classList.add('border-primary', 'active');
-            } else {
-                item.classList.remove('border-primary', 'active');
-            }
+    document.querySelectorAll('.thumb-item').forEach((thumb) => {
+        const itemIdx = parseInt(thumb.getAttribute('data-index'));
+        if (itemIdx === currentMediaIndex) {
+            thumb.classList.add('border-primary', 'active');
+        } else {
+            thumb.classList.remove('border-primary', 'active');
         }
     });
 }
 
 function openProductLightbox(startIndex = null) {
-    if (startIndex !== null && startIndex >= 0 && startIndex < productImages.length) {
-        currentImageIndex = startIndex;
+    if (startIndex !== null && startIndex >= 0 && startIndex < productMedia.length) {
+        currentMediaIndex = startIndex;
     }
-    setLightboxImage(currentImageIndex);
+    setLightboxMedia(currentMediaIndex);
     
     const modalEl = document.getElementById('productImageModal');
     if (modalEl) {
@@ -532,53 +548,115 @@ function openProductLightbox(startIndex = null) {
     }
 }
 
-function setLightboxImage(index) {
-    if (!productImages || productImages.length === 0) return;
+function setLightboxMedia(index) {
+    if (!productMedia || productMedia.length === 0) return;
     
     if (index < 0) {
-        index = productImages.length - 1;
-    } else if (index >= productImages.length) {
+        index = productMedia.length - 1;
+    } else if (index >= productMedia.length) {
         index = 0;
     }
     
-    currentImageIndex = index;
+    currentMediaIndex = index;
+    const media = productMedia[currentMediaIndex];
     
-    const lightboxImg = document.getElementById('lightboxImage');
-    if (lightboxImg) {
-        lightboxImg.style.opacity = '0.4';
-        lightboxImg.src = productImages[currentImageIndex];
-        lightboxImg.onload = () => {
-            lightboxImg.style.opacity = '1';
-        };
-    }
-    
+    // Update counter & badge
     const currentNumEl = document.getElementById('lightboxCurrentNum');
     if (currentNumEl) {
-        currentNumEl.textContent = (currentImageIndex + 1);
+        currentNumEl.textContent = (currentMediaIndex + 1);
     }
+    const iconEl = document.getElementById('lightboxTypeIcon');
+    const badgeEl = document.getElementById('lightboxVideoBadge');
     
-    // Update highlight thumbnail di dalam modal popup
-    document.querySelectorAll('.lightbox-thumb').forEach((thumb, idx) => {
-        if (idx === currentImageIndex) {
-            thumb.classList.add('border-primary', 'active');
-            thumb.classList.remove('border-secondary', 'opacity-60');
-            thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        } else {
-            thumb.classList.remove('border-primary', 'active');
-            thumb.classList.add('border-secondary', 'opacity-60');
+    const imgContainer = document.getElementById('lightboxImageContainer');
+    const vidContainer = document.getElementById('lightboxVideoContainer');
+    const lightboxImg = document.getElementById('lightboxImage');
+    const videoPlayer = document.getElementById('lightboxVideoPlayer');
+    const ytPlayer = document.getElementById('lightboxYoutubePlayer');
+    
+    // Stop & reset pemutar video yang sedang berjalan
+    if (videoPlayer) {
+        videoPlayer.pause();
+        videoPlayer.currentTime = 0;
+        videoPlayer.src = '';
+        videoPlayer.classList.add('d-none');
+    }
+    if (ytPlayer) {
+        ytPlayer.src = '';
+        ytPlayer.classList.add('d-none');
+    }
+
+    if (media.type === 'image') {
+        if (iconEl) iconEl.className = 'bi bi-images me-1';
+        if (badgeEl) badgeEl.classList.add('d-none');
+        if (vidContainer) {
+            vidContainer.classList.add('d-none');
+            vidContainer.classList.remove('d-flex');
         }
-    });
-    
-    // Sinkronkan gambar di halaman utama
-    changeMainImage(currentImageIndex);
+        if (imgContainer) imgContainer.classList.remove('d-none');
+        
+        if (lightboxImg) {
+            lightboxImg.style.opacity = '0.3';
+            lightboxImg.src = media.url;
+            lightboxImg.onload = () => {
+                lightboxImg.style.opacity = '1';
+            };
+        }
+        changeMainImage(currentMediaIndex);
+    } else if (media.type === 'video_file') {
+        if (iconEl) iconEl.className = 'bi bi-play-circle me-1';
+        if (badgeEl) badgeEl.classList.remove('d-none');
+        if (imgContainer) imgContainer.classList.add('d-none');
+        if (vidContainer) {
+            vidContainer.classList.remove('d-none');
+            vidContainer.classList.add('d-flex');
+        }
+        if (videoPlayer) {
+            videoPlayer.classList.remove('d-none');
+            videoPlayer.src = media.url;
+            videoPlayer.currentTime = 0;
+            const playPromise = videoPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.log('Video autoplay prevented by browser policy:', err);
+                });
+            }
+        }
+    } else if (media.type === 'youtube') {
+        if (iconEl) iconEl.className = 'bi bi-youtube me-1';
+        if (badgeEl) badgeEl.classList.remove('d-none');
+        if (imgContainer) imgContainer.classList.add('d-none');
+        if (vidContainer) {
+            vidContainer.classList.remove('d-none');
+            vidContainer.classList.add('d-flex');
+        }
+        if (ytPlayer) {
+            ytPlayer.classList.remove('d-none');
+            const sep = media.url.includes('?') ? '&' : '?';
+            ytPlayer.src = media.url + sep + 'autoplay=1&rel=0';
+        }
+    }
 }
 
-function nextLightboxImage() {
-    setLightboxImage(currentImageIndex + 1);
+function nextLightboxMedia() {
+    setLightboxMedia(currentMediaIndex + 1);
 }
 
-function prevLightboxImage() {
-    setLightboxImage(currentImageIndex - 1);
+function prevLightboxMedia() {
+    setLightboxMedia(currentMediaIndex - 1);
+}
+
+// Compatibility aliases
+function nextLightboxImage() { nextLightboxMedia(); }
+function prevLightboxImage() { prevLightboxMedia(); }
+function setLightboxImage(idx) { setLightboxMedia(idx); }
+
+function openProductVideoModal() {
+    <?php if ($videoMediaIndex !== null): ?>
+        openProductLightbox(<?= $videoMediaIndex ?>);
+    <?php else: ?>
+        openProductLightbox(0);
+    <?php endif; ?>
 }
 
 // Navigasi keyboard (Panah Kiri & Panah Kanan)
@@ -587,36 +665,60 @@ document.addEventListener('keydown', (e) => {
     if (modalEl && modalEl.classList.contains('show')) {
         if (e.key === 'ArrowLeft') {
             e.preventDefault();
-            prevLightboxImage();
+            prevLightboxMedia();
         } else if (e.key === 'ArrowRight') {
             e.preventDefault();
-            nextLightboxImage();
+            nextLightboxMedia();
         }
     }
 });
 
-// Navigasi swipe layar sentuh di HP/Mobile
+// Navigasi swipe layar sentuh di HP/Mobile & cleanup saat tutup modal
 document.addEventListener('DOMContentLoaded', () => {
-    const lightboxContainer = document.querySelector('#productImageModal .modal-body');
-    if (lightboxContainer) {
-        let touchStartX = 0;
-        let touchEndX = 0;
-        
-        lightboxContainer.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-        
-        lightboxContainer.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            if (touchStartX - touchEndX > 45) {
-                // Geser ke kiri -> Gambar Selanjutnya
-                nextLightboxImage();
-            } else if (touchEndX - touchStartX > 45) {
-                // Geser ke kanan -> Gambar Sebelumnya
-                prevLightboxImage();
+    const lightboxModal = document.getElementById('productImageModal');
+    if (lightboxModal) {
+        // Otomatis pause/hentikan video saat popup ditutup
+        lightboxModal.addEventListener('hidden.bs.modal', () => {
+            const videoPlayer = document.getElementById('lightboxVideoPlayer');
+            if (videoPlayer) {
+                videoPlayer.pause();
+                videoPlayer.currentTime = 0;
+                videoPlayer.src = '';
             }
-        }, { passive: true });
+            const ytPlayer = document.getElementById('lightboxYoutubePlayer');
+            if (ytPlayer) {
+                ytPlayer.src = '';
+            }
+        });
+
+        const lightboxContainer = lightboxModal.querySelector('.modal-body');
+        if (lightboxContainer) {
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            lightboxContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            
+            lightboxContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                if (touchStartX - touchEndX > 45) {
+                    // Geser ke kiri -> Media Selanjutnya
+                    nextLightboxMedia();
+                } else if (touchEndX - touchStartX > 45) {
+                    // Geser ke kanan -> Media Sebelumnya
+                    prevLightboxMedia();
+                }
+            }, { passive: true });
+        }
     }
+
+    // Pastikan thumbnail preview video lokal menampilkan frame
+    document.querySelectorAll('.video-thumb-preview').forEach(v => {
+        v.addEventListener('loadedmetadata', () => {
+            v.currentTime = 0.5;
+        });
+    });
 });
 
 function adjustQty(amount) {
@@ -624,13 +726,6 @@ function adjustQty(amount) {
     let val = parseInt(input.value) || 1;
     val = Math.max(1, Math.min(val + amount, parseInt(input.max) || 999));
     input.value = val;
-}
-
-function openProductVideoModal() {
-    const modalEl = document.getElementById('productVideoModal');
-    if (!modalEl) return;
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modal.show();
 }
 
 function switchToVideoTab(el) {
@@ -641,48 +736,4 @@ function switchToVideoTab(el) {
         videoTabBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    const videoModal = document.getElementById('productVideoModal');
-    if (videoModal) {
-        const videoEl = document.getElementById('modalProductVideo');
-        const ytIframe = document.getElementById('modalYoutubeIframe');
-
-        // Otomatis putar ketika popup muncul
-        videoModal.addEventListener('shown.bs.modal', () => {
-            if (videoEl) {
-                videoEl.currentTime = 0;
-                const playPromise = videoEl.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log('Autoplay dicegah oleh kebijakan browser:', error);
-                    });
-                }
-            }
-            if (ytIframe && ytIframe.dataset.src) {
-                const baseSrc = ytIframe.dataset.src;
-                const separator = baseSrc.includes('?') ? '&' : '?';
-                ytIframe.src = baseSrc + separator + 'autoplay=1&rel=0';
-            }
-        });
-
-        // Otomatis jeda/hentikan suara saat popup ditutup
-        videoModal.addEventListener('hidden.bs.modal', () => {
-            if (videoEl) {
-                videoEl.pause();
-                videoEl.currentTime = 0;
-            }
-            if (ytIframe) {
-                ytIframe.src = '';
-            }
-        });
-    }
-
-    // Pastikan thumbnail preview video lokal menampilkan frame
-    document.querySelectorAll('.video-thumb-preview').forEach(v => {
-        v.addEventListener('loadedmetadata', () => {
-            v.currentTime = 0.5;
-        });
-    });
-});
 </script>
