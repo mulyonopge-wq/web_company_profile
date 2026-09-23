@@ -53,6 +53,19 @@ class CompanyController extends AdminBaseController
             'promo_card_wa_message',
             'promo_card_btn_secondary_text',
             'promo_card_btn_secondary_url',
+            'features_enabled',
+            'feature_1_icon',
+            'feature_1_title',
+            'feature_1_desc',
+            'feature_2_icon',
+            'feature_2_title',
+            'feature_2_desc',
+            'feature_3_icon',
+            'feature_3_title',
+            'feature_3_desc',
+            'feature_4_icon',
+            'feature_4_title',
+            'feature_4_desc',
         ];
 
         foreach ($fields as $field) {

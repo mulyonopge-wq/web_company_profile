@@ -174,6 +174,121 @@ use App\Helpers\UrlHelper;
                     </div>
                 </div>
             </div>
+
+            <!-- 4 Card Fitur / Keunggulan Layanan -->
+            <div class="card border rounded-4 p-4 shadow-sm bg-white mb-4" id="keunggulan-fitur">
+                <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="bi bi-grid-fill fs-5 text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Card Keunggulan & Layanan Utama (4 Card Beranda)</h5>
+                            <small class="text-secondary">Empat kartu nilai keunggulan tepat di bawah slider banner pada halaman Beranda.</small>
+                        </div>
+                    </div>
+                    <div>
+                        <select name="features_enabled" class="form-select form-select-sm fw-semibold">
+                            <option value="1" <?= ($company['features_enabled'] ?? '1') !== '0' ? 'selected' : '' ?>>Tampilkan</option>
+                            <option value="0" <?= ($company['features_enabled'] ?? '1') === '0' ? 'selected' : '' ?>>Sembunyikan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Card 1 -->
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 bg-light h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary">Card 1</span>
+                                <small class="text-muted">Default: 100% Produk Original</small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Ikon Bootstrap Icons</label>
+                                <input type="text" name="feature_1_icon" class="form-control form-control-sm" value="<?= e($company['feature_1_icon'] ?? 'bi-patch-check-fill') ?>" placeholder="bi-patch-check-fill">
+                                <small class="text-muted" style="font-size: 0.75rem;">Contoh: <code>bi-patch-check-fill</code>, <code>bi-award-fill</code></small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Judul Card 1 *</label>
+                                <input type="text" name="feature_1_title" class="form-control form-control-sm" value="<?= e($company['feature_1_title'] ?? '100% Produk Original') ?>" placeholder="100% Produk Original">
+                            </div>
+                            <div>
+                                <label class="form-label small fw-semibold">Keterangan / Deskripsi</label>
+                                <textarea name="feature_1_desc" rows="2" class="form-control form-control-sm" placeholder="Deskripsi singkat..."><?= e($company['feature_1_desc'] ?? 'Seluruh perangkat bergaransi resmi distributor dengan jaminan keaslian unit.') ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 bg-light h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary">Card 2</span>
+                                <small class="text-muted">Default: Konsultasi Ahli IT</small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Ikon Bootstrap Icons</label>
+                                <input type="text" name="feature_2_icon" class="form-control form-control-sm" value="<?= e($company['feature_2_icon'] ?? 'bi-headset') ?>" placeholder="bi-headset">
+                                <small class="text-muted" style="font-size: 0.75rem;">Contoh: <code>bi-headset</code>, <code>bi-person-check</code></small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Judul Card 2 *</label>
+                                <input type="text" name="feature_2_title" class="form-control form-control-sm" value="<?= e($company['feature_2_title'] ?? 'Konsultasi Ahli IT') ?>" placeholder="Konsultasi Ahli IT">
+                            </div>
+                            <div>
+                                <label class="form-label small fw-semibold">Keterangan / Deskripsi</label>
+                                <textarea name="feature_2_desc" rows="2" class="form-control form-control-sm" placeholder="Deskripsi singkat..."><?= e($company['feature_2_desc'] ?? 'Didukung teknisi berpengalaman untuk membantu konfigurasi topologi jaringan Anda.') ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 bg-light h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary">Card 3</span>
+                                <small class="text-muted">Default: Pengiriman Cepat & Aman</small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Ikon Bootstrap Icons</label>
+                                <input type="text" name="feature_3_icon" class="form-control form-control-sm" value="<?= e($company['feature_3_icon'] ?? 'bi-truck') ?>" placeholder="bi-truck">
+                                <small class="text-muted" style="font-size: 0.75rem;">Contoh: <code>bi-truck</code>, <code>bi-box-seam</code></small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Judul Card 3 *</label>
+                                <input type="text" name="feature_3_title" class="form-control form-control-sm" value="<?= e($company['feature_3_title'] ?? 'Pengiriman Cepat & Aman') ?>" placeholder="Pengiriman Cepat & Aman">
+                            </div>
+                            <div>
+                                <label class="form-label small fw-semibold">Keterangan / Deskripsi</label>
+                                <textarea name="feature_3_desc" rows="2" class="form-control form-control-sm" placeholder="Deskripsi singkat..."><?= e($company['feature_3_desc'] ?? 'Pengemasan bubble wrap tebal dan opsi packing kayu untuk pengiriman seluruh nusantara.') ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 bg-light h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary">Card 4</span>
+                                <small class="text-muted">Default: Order Cepat via WhatsApp</small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Ikon Bootstrap Icons</label>
+                                <input type="text" name="feature_4_icon" class="form-control form-control-sm" value="<?= e($company['feature_4_icon'] ?? 'bi-whatsapp') ?>" placeholder="bi-whatsapp">
+                                <small class="text-muted" style="font-size: 0.75rem;">Contoh: <code>bi-whatsapp</code>, <code>bi-chat-dots-fill</code></small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Judul Card 4 *</label>
+                                <input type="text" name="feature_4_title" class="form-control form-control-sm" value="<?= e($company['feature_4_title'] ?? 'Order Cepat via WhatsApp') ?>" placeholder="Order Cepat via WhatsApp">
+                            </div>
+                            <div>
+                                <label class="form-label small fw-semibold">Keterangan / Deskripsi</label>
+                                <textarea name="feature_4_desc" rows="2" class="form-control form-control-sm" placeholder="Deskripsi singkat..."><?= e($company['feature_4_desc'] ?? 'Pemesanan instan tanpa ribet, langsung terhubung ke admin penjualan resmi.') ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Contact & Media Sidebar -->

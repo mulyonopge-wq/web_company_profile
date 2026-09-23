@@ -69,46 +69,50 @@ $badgeDesc = !empty($settings['company_badge_desc']) ? $settings['company_badge_
 <?php endif; ?>
 
 <!-- Quick Features / Keunggulan Perusahaan -->
+<?php
+$featuresEnabled = ($settings['features_enabled'] ?? '1') !== '0';
+$featureCards = [
+    [
+        'icon' => $settings['feature_1_icon'] ?? 'bi-patch-check-fill',
+        'title' => $settings['feature_1_title'] ?? '100% Produk Original',
+        'desc' => $settings['feature_1_desc'] ?? 'Seluruh perangkat bergaransi resmi distributor dengan jaminan keaslian unit.',
+    ],
+    [
+        'icon' => $settings['feature_2_icon'] ?? 'bi-headset',
+        'title' => $settings['feature_2_title'] ?? 'Konsultasi Ahli IT',
+        'desc' => $settings['feature_2_desc'] ?? 'Didukung teknisi berpengalaman untuk membantu konfigurasi topologi jaringan Anda.',
+    ],
+    [
+        'icon' => $settings['feature_3_icon'] ?? 'bi-truck',
+        'title' => $settings['feature_3_title'] ?? 'Pengiriman Cepat & Aman',
+        'desc' => $settings['feature_3_desc'] ?? 'Pengemasan bubble wrap tebal dan opsi packing kayu untuk pengiriman seluruh nusantara.',
+    ],
+    [
+        'icon' => $settings['feature_4_icon'] ?? 'bi-whatsapp',
+        'title' => $settings['feature_4_title'] ?? 'Order Cepat via WhatsApp',
+        'desc' => $settings['feature_4_desc'] ?? 'Pemesanan instan tanpa ribet, langsung terhubung ke admin penjualan resmi.',
+    ],
+];
+?>
+<?php if ($featuresEnabled): ?>
 <section class="container py-4 mb-5">
     <div class="row g-4">
-        <div class="col-md-6 col-lg-3">
-            <div class="feature-card h-100">
-                <div class="feature-icon-wrapper">
-                    <i class="bi bi-patch-check-fill"></i>
+        <?php foreach ($featureCards as $fc): ?>
+            <?php if (!empty($fc['title'])): ?>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi <?= e($fc['icon'] ?: 'bi-check-circle-fill') ?>"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2"><?= e($fc['title']) ?></h5>
+                        <p class="text-secondary small mb-0"><?= e($fc['desc']) ?></p>
+                    </div>
                 </div>
-                <h5 class="fw-bold mb-2">100% Produk Original</h5>
-                <p class="text-secondary small mb-0">Seluruh perangkat bergaransi resmi distributor dengan jaminan keaslian unit.</p>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="feature-card h-100">
-                <div class="feature-icon-wrapper">
-                    <i class="bi bi-headset"></i>
-                </div>
-                <h5 class="fw-bold mb-2">Konsultasi Ahli IT</h5>
-                <p class="text-secondary small mb-0">Didukung teknisi berpengalaman untuk membantu konfigurasi topologi jaringan Anda.</p>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="feature-card h-100">
-                <div class="feature-icon-wrapper">
-                    <i class="bi bi-truck"></i>
-                </div>
-                <h5 class="fw-bold mb-2">Pengiriman Cepat & Aman</h5>
-                <p class="text-secondary small mb-0">Pengemasan bubble wrap tebal dan opsi packing kayu untuk pengiriman seluruh nusantara.</p>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="feature-card h-100">
-                <div class="feature-icon-wrapper">
-                    <i class="bi bi-whatsapp"></i>
-                </div>
-                <h5 class="fw-bold mb-2">Order Cepat via WhatsApp</h5>
-                <p class="text-secondary small mb-0">Pemesanan instan tanpa ribet, langsung terhubung ke admin penjualan resmi.</p>
-            </div>
-        </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
     </div>
 </section>
+<?php endif; ?>
 
 <!-- About Company Snippet -->
 <section class="py-5 bg-white mb-5 border-top border-bottom">
