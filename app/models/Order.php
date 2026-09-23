@@ -131,6 +131,18 @@ class Order extends BaseModel
         return self::update('orders', ['status' => $status], '`id` = :id', [':id' => $id]);
     }
 
+    public static function cancel(int $id): bool
+    {
+        return self::update('orders', ['status' => 'cancelled'], '`id` = :id', [':id' => $id]) > 0;
+    }
+
+    public static function deleteOrder(int $id): bool
+    {
+        // Delete related items first to ensure clean cascade across MySQL engines
+        self::delete('order_items', '`order_id` = :id', [':id' => $id]);
+        return self::delete('orders', '`id` = :id', [':id' => $id]) > 0;
+    }
+
     public static function getStatistics(): array
     {
         $totalProducts = (int) self::fetchColumn('SELECT COUNT(*) FROM `products`');

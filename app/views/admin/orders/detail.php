@@ -13,14 +13,30 @@ $badgeClass = match($order['status']) {
 };
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
     <div>
         <h3 class="fw-bold text-dark mb-1">Detail Pesanan: <?= e($order['order_number']) ?></h3>
         <p class="text-secondary small mb-0">Dibuat pada: <?= date('d F Y, H:i WIB', strtotime($order['created_at'])) ?></p>
     </div>
-    <a href="<?= UrlHelper::base('admin/orders') ?>" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-        <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
-    </a>
+    <div class="d-flex flex-wrap gap-2">
+        <?php if ($order['status'] !== 'cancelled'): ?>
+            <form action="<?= UrlHelper::base('admin/orders/cancel/' . $order['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan <?= e($order['order_number']) ?>?')">
+                <?= CsrfHelper::field() ?>
+                <button type="submit" class="btn btn-outline-warning btn-sm rounded-pill px-3">
+                    <i class="bi bi-x-circle me-1"></i> Batalkan Pesanan
+                </button>
+            </form>
+        <?php endif; ?>
+        <form action="<?= UrlHelper::base('admin/orders/delete/' . $order['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin MENGHAPUS PERMANEN pesanan <?= e($order['order_number']) ?>?\n\nData pesanan dan daftar produk terkait akan dihapus secara permanen.')">
+            <?= CsrfHelper::field() ?>
+            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                <i class="bi bi-trash me-1"></i> Hapus Pesanan
+            </button>
+        </form>
+        <a href="<?= UrlHelper::base('admin/orders') ?>" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
+        </a>
+    </div>
 </div>
 
 <div class="row g-4">
@@ -109,6 +125,26 @@ $badgeClass = match($order['status']) {
                     <i class="bi bi-check2-circle me-1"></i> Perbarui Status
                 </button>
             </form>
+
+            <hr class="my-3">
+
+            <div class="d-flex flex-column gap-2">
+                <?php if ($order['status'] !== 'cancelled'): ?>
+                    <form action="<?= UrlHelper::base('admin/orders/cancel/' . $order['id']) ?>" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan <?= e($order['order_number']) ?>?')">
+                        <?= CsrfHelper::field() ?>
+                        <button type="submit" class="btn btn-outline-warning btn-sm rounded-pill w-100">
+                            <i class="bi bi-x-circle me-1"></i> Batalkan Pesanan Ini
+                        </button>
+                    </form>
+                <?php endif; ?>
+
+                <form action="<?= UrlHelper::base('admin/orders/delete/' . $order['id']) ?>" method="POST" onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin MENGHAPUS PERMANEN pesanan <?= e($order['order_number']) ?>?\n\nData pesanan dan daftar produk terkait akan dihapus secara permanen.')">
+                    <?= CsrfHelper::field() ?>
+                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill w-100">
+                        <i class="bi bi-trash me-1"></i> Hapus Pesanan Permanen
+                    </button>
+                </form>
+            </div>
         </div>
 
         <!-- Customer Card -->

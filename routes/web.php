@@ -93,6 +93,8 @@ Router::post('/admin/products/delete-image/{id}', 'Admin\ProductController@delet
 Router::get('/admin/orders', 'Admin\OrderController@index');
 Router::get('/admin/orders/detail/{id}', 'Admin\OrderController@detail');
 Router::post('/admin/orders/status/{id}', 'Admin\OrderController@updateStatus');
+Router::post('/admin/orders/cancel/{id}', 'Admin\OrderController@cancel');
+Router::post('/admin/orders/delete/{id}', 'Admin\OrderController@delete');
 
 // Customers
 Router::get('/admin/customers', 'Admin\CustomerController@index');

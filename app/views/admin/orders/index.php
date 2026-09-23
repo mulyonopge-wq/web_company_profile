@@ -1,4 +1,5 @@
 <?php
+use App\Helpers\CsrfHelper;
 use App\Helpers\Sanitizer;
 use App\Helpers\UrlHelper;
 ?>
@@ -46,7 +47,7 @@ use App\Helpers\UrlHelper;
                     <th>Item</th>
                     <th>Total</th>
                     <th>Status</th>
-                    <th style="width: 100px;" class="text-end">Aksi</th>
+                    <th style="width: 220px;" class="text-end">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -91,10 +92,28 @@ use App\Helpers\UrlHelper;
                             <td>
                                 <span class="badge <?= $badgeClass ?> rounded-pill small"><?= strtoupper(e($o['status'])) ?></span>
                             </td>
-                            <td class="text-end">
-                                <a href="<?= UrlHelper::base('admin/orders/detail/' . $o['id']) ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                    Detail <i class="bi bi-chevron-right"></i>
-                                </a>
+                            <td class="text-end text-nowrap">
+                                <div class="d-inline-flex align-items-center gap-1">
+                                    <a href="<?= UrlHelper::base('admin/orders/detail/' . $o['id']) ?>" class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1" title="Lihat Detail Pesanan">
+                                        <i class="bi bi-eye me-1"></i>Detail
+                                    </a>
+
+                                    <?php if ($o['status'] !== 'cancelled'): ?>
+                                        <form action="<?= UrlHelper::base('admin/orders/cancel/' . $o['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin MEMBATALKAN pesanan <?= e($o['order_number']) ?>?')">
+                                            <?= CsrfHelper::field() ?>
+                                            <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill px-2 py-1" title="Batalkan Pesanan">
+                                                <i class="bi bi-x-circle me-1"></i>Batal
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+
+                                    <form action="<?= UrlHelper::base('admin/orders/delete/' . $o['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin MENGHAPUS PERMANEN pesanan <?= e($o['order_number']) ?>?\n\nData pesanan dan daftar produk terkait akan dihapus secara permanen.')">
+                                        <?= CsrfHelper::field() ?>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1" title="Hapus Pesanan">
+                                            <i class="bi bi-trash me-1"></i>Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
