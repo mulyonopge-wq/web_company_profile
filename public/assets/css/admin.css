@@ -1,0 +1,294 @@
+/* ==============================================================
+   Admin Panel Stylesheet
+   PT Solusi Tekno Nusantara
+   ============================================================== */
+
+:root {
+  --admin-sidebar-bg: #0f172a;
+  --admin-sidebar-hover: #1e293b;
+  --admin-sidebar-active: #2563eb;
+  --admin-sidebar-text: #94a3b8;
+  --admin-sidebar-text-active: #ffffff;
+  --admin-topbar-bg: #ffffff;
+  --admin-body-bg: #f1f5f9;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--admin-body-bg);
+  color: #334155;
+}
+
+/* Layout Wrapper */
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: 260px;
+  background-color: var(--admin-sidebar-bg);
+  color: var(--admin-sidebar-text);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-brand-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.sidebar-nav {
+  padding: 1rem 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.sidebar-heading {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  padding: 0.75rem 1.5rem 0.25rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 1.5rem;
+  color: var(--admin-sidebar-text);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link i {
+  font-size: 1.15rem;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-link:hover {
+  color: #ffffff;
+  background-color: var(--admin-sidebar-hover);
+}
+
+.sidebar-link.active {
+  color: var(--admin-sidebar-text-active);
+  background-color: var(--admin-sidebar-active);
+  font-weight: 600;
+}
+
+/* Content Area */
+.admin-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Topbar */
+.admin-topbar {
+  height: 64px;
+  background-color: var(--admin-topbar-bg);
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.75rem;
+}
+
+.admin-content {
+  padding: 1.75rem;
+  flex: 1 1 auto;
+}
+
+/* Metric Cards */
+.metric-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.metric-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.4rem;
+}
+
+.metric-number {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -260px;
+  }
+  .admin-sidebar.show {
+    left: 0;
+    box-shadow: 5px 0 25px rgba(0,0,0,0.3);
+  }
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    display: none;
+  }
+  .sidebar-backdrop.show {
+    display: block;
+  }
+}
+
+/* ==============================================================
+   Admin Dark Theme Overrides
+   ============================================================== */
+.theme-toggle-btn {
+  border: 1px solid #d1d5db;
+  background-color: transparent;
+  color: #4b5563;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.theme-toggle-btn:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+  border-color: #9ca3af;
+}
+
+[data-bs-theme="dark"] {
+  --admin-topbar-bg: #111827;
+  --admin-body-bg: #0b0f19;
+}
+
+[data-bs-theme="dark"] body {
+  color: #e5e7eb;
+  background-color: #0b0f19;
+}
+
+[data-bs-theme="dark"] .admin-topbar {
+  border-bottom: 1px solid #1f2937;
+}
+
+[data-bs-theme="dark"] .metric-card,
+[data-bs-theme="dark"] .card {
+  background-color: #111827;
+  border-color: #1f2937;
+  color: #e5e7eb;
+}
+
+[data-bs-theme="dark"] .metric-number {
+  color: #f9fafb;
+}
+
+[data-bs-theme="dark"] .metric-title {
+  color: #9ca3af;
+}
+
+[data-bs-theme="dark"] .text-dark {
+  color: #f9fafb !important;
+}
+
+[data-bs-theme="dark"] .bg-white {
+  background-color: #111827 !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+  background-color: #162032 !important;
+}
+
+[data-bs-theme="dark"] .table {
+  --bs-table-bg: #111827;
+  --bs-table-striped-bg: #162032;
+  --bs-table-hover-bg: #1e293b;
+  --bs-table-color: #e5e7eb;
+  --bs-table-border-color: #1f2937;
+}
+
+[data-bs-theme="dark"] .border {
+  border-color: #1f2937 !important;
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+  background-color: #162032;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+  background-color: #162032;
+  border-color: #3b82f6;
+  color: #f9fafb;
+}
+
+[data-bs-theme="dark"] .dropdown-menu {
+  background-color: #111827;
+  border-color: #1f2937;
+  color: #e5e7eb;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+  color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+  background-color: #1e293b;
+  color: #ffffff;
+}
+
+[data-bs-theme="dark"] .theme-toggle-btn {
+  border-color: #374151;
+  color: #f59e0b;
+}
+
+[data-bs-theme="dark"] .theme-toggle-btn:hover {
+  background-color: #1f2937;
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
