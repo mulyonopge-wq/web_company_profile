@@ -139,7 +139,7 @@ use App\Helpers\UrlHelper;
     <div class="card-body p-4">
         <p class="text-secondary small mb-2">Jika Anda lebih menyukai menggunakan Terminal aaPanel / SSH secara langsung, jalankan perintah berikut:</p>
         <div class="bg-light p-3 rounded-3 position-relative font-monospace small">
-            <code>cd <?= e($gitInfo['installed'] ? dirname(__DIR__, 3) : '/www/wwwroot/domainanda.com') ?><br>git pull origin main</code>
+            <code>cd <?= e($repoPath ?? '/www/wwwroot/gambiran.bumdes13.id') ?><br>git pull origin main</code>
         </div>
     </div>
 </div>
