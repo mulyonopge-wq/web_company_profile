@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS `categories`;
 DROP TABLE IF EXISTS `banners`;
 DROP TABLE IF EXISTS `articles`;
 DROP TABLE IF EXISTS `galleries`;
+DROP TABLE IF EXISTS `teams`;
 DROP TABLE IF EXISTS `pages`;
 DROP TABLE IF EXISTS `settings`;
 DROP TABLE IF EXISTS `admins`;
@@ -235,6 +236,23 @@ CREATE TABLE `galleries` (
   INDEX `idx_gallery_order` (`sort_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- -------------------------------------------------------------
+-- Table: teams (Tim Manajemen & Pimpinan / Pengurus)
+-- -------------------------------------------------------------
+CREATE TABLE `teams` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(150) NOT NULL,
+  `position` VARCHAR(150) NOT NULL,
+  `photo` VARCHAR(255) NULL,
+  `bio` TEXT NULL,
+  `sort_order` INT NOT NULL DEFAULT 0,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX `idx_team_order` (`sort_order`),
+  INDEX `idx_team_active` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- ==============================================================
 -- INITIAL SEED DATA
@@ -365,3 +383,11 @@ INSERT INTO `galleries` (`id`, `title`, `description`, `category`, `image`, `is_
 (2, 'Warehouse & Stock Center', 'Gudang penyimpanan stok router, kabel UTP, switch, dan UPS yang siap dikirim.', 'Fasilitas', '', 1, 2),
 (3, 'Instalasi Jaringan Klien Korporat', 'Dokumentasi perapihan rack server dan instalasi kabel LAN terstruktur oleh teknisi kami.', 'Proyek', '', 1, 3),
 (4, 'Sesi Konsultasi & Demo Produk', 'Diskusi teknis solusi infrastruktur internet bersama klien UMKM dan instansi.', 'Kegiatan', '', 1, 4);
+
+-- 11. Teams (Tim Manajemen & Pimpinan / Pengurus)
+INSERT INTO `teams` (`id`, `name`, `position`, `photo`, `bio`, `sort_order`, `is_active`) VALUES
+(1, 'Dr. H. Muhammad Arifin, M.M.', 'Komisaris Utama', '', 'Berpengalaman lebih dari 20 tahun dalam tata kelola korporasi, kepemimpinan strategis, dan investasi teknologi.', 1, 1),
+(2, 'Ir. Hendra Gunawan, S.T., M.T.', 'Direktur Utama', '', 'Memimpin arah strategis perusahaan, kemitraan global, dan inovasi integrasi infrastruktur digital di Indonesia.', 2, 1),
+(3, 'Bambang Pratama, S.Kom., CCNA', 'Direktur Operasional & Teknologi', '', 'Mengawasi operasional logistik, implementasi solusi jaringan enterprise, dan standardisasi kualitas layanan purna jual.', 3, 1),
+(4, 'Siti Rahmawati, S.E., Ak.', 'Manajer Keuangan & Administrasi', '', 'Bertanggung jawab atas efisiensi finansial, kepatuhan akuntansi korporat, dan manajemen hubungan kemitraan perbankan.', 4, 1);
+

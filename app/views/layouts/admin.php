@@ -56,6 +56,9 @@ $companyName = $settings['company_name'] ?? 'Admin Panel';
             <a href="<?= UrlHelper::base('admin/company') ?>" class="sidebar-link <?= UrlHelper::isActive('admin/company') ?>">
                 <i class="bi bi-building"></i> Profil Perusahaan
             </a>
+            <a href="<?= UrlHelper::base('admin/teams') ?>" class="sidebar-link <?= UrlHelper::isActive('admin/teams') ?>">
+                <i class="bi bi-people-fill"></i> Tim & Pimpinan
+            </a>
             <a href="<?= UrlHelper::base('admin/settings') ?>" class="sidebar-link <?= UrlHelper::isActive('admin/settings') ?>">
                 <i class="bi bi-gear-fill"></i> Pengaturan Website
             </a>

@@ -59,6 +59,15 @@ Router::get('/admin/dashboard', 'Admin\DashboardController@index');
 Router::get('/admin/company', 'Admin\CompanyController@index');
 Router::post('/admin/company/update', 'Admin\CompanyController@update');
 
+// Management Team / Leadership CMS
+Router::get('/admin/teams', 'Admin\TeamController@index');
+Router::get('/admin/teams/tambah', 'Admin\TeamController@create');
+Router::post('/admin/teams/simpan', 'Admin\TeamController@store');
+Router::get('/admin/teams/edit/{id}', 'Admin\TeamController@edit');
+Router::post('/admin/teams/update/{id}', 'Admin\TeamController@update');
+Router::post('/admin/teams/hapus/{id}', 'Admin\TeamController@delete');
+
+
 // Website Settings & Pages
 Router::get('/admin/settings', 'Admin\SettingController@index');
 Router::post('/admin/settings/update', 'Admin\SettingController@update');

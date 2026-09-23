@@ -125,6 +125,60 @@ $badgeDesc = !empty($settings['company_badge_desc']) ? $settings['company_badge_
         </div>
     </div>
 
+    <!-- Tim Manajemen & Pimpinan / Pengurus -->
+    <?php 
+    $teamList = !empty($teams) ? $teams : (class_exists('App\Models\Team') ? App\Models\Team::getActive() : []);
+    ?>
+    <div class="mb-5">
+        <div class="text-center mb-5">
+            <span class="badge text-bg-primary px-3 py-2 rounded-pill mb-2">
+                <i class="bi bi-people-fill me-1"></i> Kepemimpinan & Pengurus
+            </span>
+            <h2 class="display-6 fw-bold text-dark mb-2">Tim Manajemen & Pimpinan</h2>
+            <p class="text-secondary mx-auto" style="max-width: 680px;">
+                Didukung oleh dewan pimpinan, direksi, dan jajaran manajemen profesional berintegritas tinggi yang berkomitmen memberikan solusi dan pelayanan terbaik bagi setiap klien.
+            </p>
+        </div>
+
+        <?php if (!empty($teamList)): ?>
+            <div class="row g-4 justify-content-center">
+                <?php foreach ($teamList as $member): ?>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card h-100 border rounded-4 shadow-sm text-center bg-white p-3 team-card overflow-hidden">
+                            <div class="pt-3 pb-2">
+                                <?php if (!empty($member['photo'])): ?>
+                                    <img src="<?= UrlHelper::upload($member['photo']) ?>" alt="<?= e($member['name']) ?>" class="rounded-circle border border-3 border-primary border-opacity-25 shadow-sm object-fit-cover mx-auto d-block" style="width: 130px; height: 130px;">
+                                <?php else: ?>
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary border border-3 border-primary border-opacity-25 shadow-sm d-flex align-items-center justify-content-center mx-auto fw-bold" style="width: 130px; height: 130px; font-size: 2.8rem;">
+                                        <?= strtoupper(mb_substr($member['name'], 0, 1)) ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-1 mb-2 fw-semibold" style="font-size: 0.8rem;">
+                                        <?= e($member['position']) ?>
+                                    </span>
+                                    <h5 class="fw-bold text-dark mb-2 fs-6"><?= e($member['name']) ?></h5>
+                                    <?php if (!empty($member['bio'])): ?>
+                                        <p class="text-secondary small leading-relaxed mb-0" style="font-size: 0.825rem;">
+                                            <?= nl2br(e($member['bio'])) ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="card border rounded-4 p-4 text-center text-muted bg-light">
+                <i class="bi bi-people fs-1 text-secondary opacity-50 mb-2"></i>
+                <p class="mb-0">Daftar tim manajemen dan pimpinan sedang diperbarui.</p>
+            </div>
+        <?php endif; ?>
+    </div>
+
     <!-- Lokasi & Kontak -->
     <div class="card border rounded-4 p-4 p-lg-5 shadow-sm">
         <div class="row g-4 align-items-center">
@@ -163,3 +217,13 @@ $badgeDesc = !empty($settings['company_badge_desc']) ? $settings['company_badge_
         </div>
     </div>
 </div>
+
+<style>
+.team-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.team-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08) !important;
+}
+</style>

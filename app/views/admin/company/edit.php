@@ -9,7 +9,10 @@ use App\Helpers\UrlHelper;
         <h3 class="fw-bold text-dark mb-1">Profil Perusahaan</h3>
         <p class="text-secondary small mb-0">Ubah seluruh data identitas, visi misi, dan kontak perusahaan tanpa edit kode.</p>
     </div>
-    <div>
+    <div class="d-flex gap-2">
+        <a href="<?= UrlHelper::base('admin/teams') ?>" class="btn btn-outline-success btn-sm rounded-pill px-3">
+            <i class="bi bi-people-fill me-1"></i> Kelola Tim & Pengurus
+        </a>
         <a href="<?= UrlHelper::base('tentang') ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
             <i class="bi bi-eye me-1"></i> Pratinjau Halaman
         </a>

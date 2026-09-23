@@ -6,15 +6,18 @@ namespace App\Controllers;
 use App\Helpers\FlashHelper;
 use App\Helpers\UrlHelper;
 use App\Models\Page;
+use App\Models\Team;
 
 class PageController extends BaseController
 {
     public function about(): void
     {
         $page = Page::findBySlug('tentang-kami');
+        $teams = Team::getActive();
         $this->renderView('pages/about', [
             'title' => 'Tentang Kami',
             'page' => $page,
+            'teams' => $teams,
         ]);
     }
 
