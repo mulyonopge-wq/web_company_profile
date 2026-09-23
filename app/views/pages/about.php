@@ -128,16 +128,23 @@ $badgeDesc = !empty($settings['company_badge_desc']) ? $settings['company_badge_
     <!-- Tim Manajemen & Pimpinan / Pengurus -->
     <?php 
     $teamList = !empty($teams) ? $teams : (class_exists('App\Models\Team') ? App\Models\Team::getActive() : []);
+    $teamTitle = class_exists('App\Models\Setting') ? App\Models\Setting::get('company_team_title', $settings['company_team_title'] ?? 'Tim Manajemen & Pimpinan / Pengurus') : ($settings['company_team_title'] ?? 'Tim Manajemen & Pimpinan / Pengurus');
+    $teamBadge = class_exists('App\Models\Setting') ? App\Models\Setting::get('company_team_badge', $settings['company_team_badge'] ?? 'Kepemimpinan & Pengurus') : ($settings['company_team_badge'] ?? 'Kepemimpinan & Pengurus');
+    $teamSubtitle = class_exists('App\Models\Setting') ? App\Models\Setting::get('company_team_subtitle', $settings['company_team_subtitle'] ?? 'Kelola daftar jajaran pimpinan, dewan direksi, dan pengurus perusahaan yang tampil di halaman profil (Tentang Kami).') : ($settings['company_team_subtitle'] ?? 'Kelola daftar jajaran pimpinan, dewan direksi, dan pengurus perusahaan yang tampil di halaman profil (Tentang Kami).');
     ?>
     <div class="mb-5">
         <div class="text-center mb-5">
-            <span class="badge text-bg-primary px-3 py-2 rounded-pill mb-2">
-                <i class="bi bi-people-fill me-1"></i> Kepemimpinan & Pengurus
-            </span>
-            <h2 class="display-6 fw-bold text-dark mb-2">Tim Manajemen & Pimpinan</h2>
-            <p class="text-secondary mx-auto" style="max-width: 680px;">
-                Didukung oleh dewan pimpinan, direksi, dan jajaran manajemen profesional berintegritas tinggi yang berkomitmen memberikan solusi dan pelayanan terbaik bagi setiap klien.
-            </p>
+            <?php if (!empty($teamBadge)): ?>
+                <span class="badge text-bg-primary px-3 py-2 rounded-pill mb-2">
+                    <i class="bi bi-people-fill me-1"></i> <?= e($teamBadge) ?>
+                </span>
+            <?php endif; ?>
+            <h2 class="display-6 fw-bold text-dark mb-2"><?= e($teamTitle) ?></h2>
+            <?php if (!empty($teamSubtitle)): ?>
+                <p class="text-secondary mx-auto" style="max-width: 680px;">
+                    <?= nl2br(e($teamSubtitle)) ?>
+                </p>
+            <?php endif; ?>
         </div>
 
         <?php if (!empty($teamList)): ?>

@@ -17,7 +17,7 @@ class BaseController
     {
         // Safe load settings
         try {
-            $this->settings = Setting::getAllSettings();
+            $this->settings = Setting::getAllSettings(true);
         } catch (Exception $e) {
             $this->settings = [];
         }

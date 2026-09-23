@@ -66,6 +66,7 @@ Router::post('/admin/teams/simpan', 'Admin\TeamController@store');
 Router::get('/admin/teams/edit/{id}', 'Admin\TeamController@edit');
 Router::post('/admin/teams/update/{id}', 'Admin\TeamController@update');
 Router::post('/admin/teams/hapus/{id}', 'Admin\TeamController@delete');
+Router::post('/admin/teams/settings', 'Admin\TeamController@updateSettings');
 
 
 // Website Settings & Pages

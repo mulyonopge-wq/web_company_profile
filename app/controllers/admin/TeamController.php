@@ -6,6 +6,7 @@ namespace App\Controllers\Admin;
 use App\Helpers\FileUpload;
 use App\Helpers\FlashHelper;
 use App\Helpers\UrlHelper;
+use App\Models\Setting;
 use App\Models\Team;
 
 class TeamController extends AdminBaseController
@@ -13,9 +14,16 @@ class TeamController extends AdminBaseController
     public function index(): void
     {
         $teams = Team::all();
+        $teamTitle = Setting::get('company_team_title', 'Tim Manajemen & Pimpinan / Pengurus');
+        $teamBadge = Setting::get('company_team_badge', 'Kepemimpinan & Pengurus');
+        $teamSubtitle = Setting::get('company_team_subtitle', 'Kelola daftar jajaran pimpinan, dewan direksi, dan pengurus perusahaan yang tampil di halaman profil (Tentang Kami).');
+
         $this->renderAdminView('admin/teams/index', [
-            'title' => 'Tim Manajemen & Pimpinan / Pengurus',
+            'title' => $teamTitle,
             'teams' => $teams,
+            'teamTitle' => $teamTitle,
+            'teamBadge' => $teamBadge,
+            'teamSubtitle' => $teamSubtitle,
         ]);
     }
 
@@ -146,4 +154,23 @@ class TeamController extends AdminBaseController
         FlashHelper::success('Anggota tim "' . $team['name'] . '" berhasil dihapus.');
         UrlHelper::redirect('/admin/teams');
     }
+
+    public function updateSettings(): void
+    {
+        $title = trim($_POST['company_team_title'] ?? '');
+        $badge = trim($_POST['company_team_badge'] ?? '');
+        $subtitle = trim($_POST['company_team_subtitle'] ?? '');
+
+        if (!empty($title)) {
+            Setting::set('company_team_title', $title, 'company');
+        }
+        if (!empty($badge)) {
+            Setting::set('company_team_badge', $badge, 'company');
+        }
+        Setting::set('company_team_subtitle', $subtitle, 'company');
+
+        FlashHelper::success('Judul dan kata-kata keterangan tim berhasil diperbarui.');
+        UrlHelper::redirect('/admin/teams');
+    }
 }
+

@@ -6,16 +6,58 @@ use App\Helpers\UrlHelper;
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-        <h3 class="fw-bold text-dark mb-1">Tim Manajemen & Pimpinan / Pengurus</h3>
-        <p class="text-secondary small mb-0">Kelola daftar jajaran pimpinan, dewan direksi, dan pengurus perusahaan yang tampil di halaman profil (Tentang Kami).</p>
+        <h3 class="fw-bold text-dark mb-1"><?= e($teamTitle) ?></h3>
+        <p class="text-secondary small mb-0"><?= e($teamSubtitle) ?></p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-primary btn-sm rounded-pill px-3" type="button" data-bs-toggle="collapse" data-bs-target="#editTeamTextsCollapse" aria-expanded="false" aria-controls="editTeamTextsCollapse">
+            <i class="bi bi-pencil-square me-1"></i> Edit Kata-kata / Judul
+        </button>
         <a href="<?= UrlHelper::base('tentang') ?>" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
             <i class="bi bi-eye me-1"></i> Lihat di Profil
         </a>
         <a href="<?= UrlHelper::base('admin/teams/tambah') ?>" class="btn btn-primary btn-sm rounded-pill px-3">
             <i class="bi bi-plus-lg me-1"></i> Tambah Anggota / Pimpinan
         </a>
+    </div>
+</div>
+
+<!-- Form Edit Kata-kata Judul & Keterangan Tim -->
+<div class="collapse mb-4" id="editTeamTextsCollapse">
+    <div class="card border rounded-4 p-4 shadow-sm bg-white">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <i class="bi bi-fonts fs-6"></i>
+            </div>
+            <div>
+                <h5 class="fw-bold text-dark mb-0">Ubah Kata-kata Judul & Keterangan Seksi</h5>
+                <small class="text-secondary">Kata-kata ini akan tampil di bagian atas daftar pimpinan/pengurus di halaman Tentang Kami.</small>
+            </div>
+        </div>
+
+        <form action="<?= UrlHelper::base('admin/teams/settings') ?>" method="POST">
+            <?= CsrfHelper::field() ?>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Label / Badge Seksi</label>
+                    <input type="text" name="company_team_badge" class="form-control" value="<?= e($teamBadge) ?>" placeholder="Contoh: Kepemimpinan & Pengurus">
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label small fw-semibold">Judul Seksi *</label>
+                    <input type="text" name="company_team_title" class="form-control" value="<?= e($teamTitle) ?>" placeholder="Contoh: Tim Manajemen & Pimpinan / Pengurus" required>
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-semibold">Kata-kata Keterangan / Deskripsi Sub-judul *</label>
+                    <textarea name="company_team_subtitle" rows="3" class="form-control" placeholder="Tuliskan kata-kata pengantar di bawah judul..."><?= e($teamSubtitle) ?></textarea>
+                </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-light btn-sm border rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#editTeamTextsCollapse">Tutup</button>
+                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-floppy-fill me-1"></i> Simpan Kata-kata
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 

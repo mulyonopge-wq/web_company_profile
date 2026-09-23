@@ -85,6 +85,32 @@ use App\Helpers\UrlHelper;
                     <textarea name="company_advantages" rows="4" class="form-control"><?= e($company['company_advantages'] ?? '') ?></textarea>
                 </div>
             </div>
+
+            <!-- Seksi Judul & Keterangan Tim Manajemen -->
+            <div class="card border rounded-4 p-4 shadow-sm bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-people-fill text-primary me-2"></i>Teks Seksi Tim Manajemen & Pimpinan</h5>
+                    <a href="<?= UrlHelper::base('admin/teams') ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        <i class="bi bi-person-lines-fill me-1"></i> Buka Manajemen Tim
+                    </a>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-5">
+                        <label class="form-label small fw-semibold">Label / Badge Seksi</label>
+                        <input type="text" name="company_team_badge" class="form-control" value="<?= e($company['company_team_badge'] ?? 'Kepemimpinan & Pengurus') ?>">
+                    </div>
+                    <div class="col-md-7">
+                        <label class="form-label small fw-semibold">Judul Seksi Tim</label>
+                        <input type="text" name="company_team_title" class="form-control" value="<?= e($company['company_team_title'] ?? 'Tim Manajemen & Pimpinan / Pengurus') ?>">
+                    </div>
+                </div>
+
+                <div class="mb-0">
+                    <label class="form-label small fw-semibold">Deskripsi / Sub-judul Seksi</label>
+                    <textarea name="company_team_subtitle" rows="3" class="form-control"><?= e($company['company_team_subtitle'] ?? 'Kelola daftar jajaran pimpinan, dewan direksi, dan pengurus perusahaan yang tampil di halaman profil (Tentang Kami).') ?></textarea>
+                </div>
+            </div>
         </div>
 
         <!-- Contact & Media Sidebar -->

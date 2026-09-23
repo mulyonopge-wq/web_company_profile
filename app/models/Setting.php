@@ -7,9 +7,9 @@ class Setting extends BaseModel
 {
     private static ?array $cachedSettings = null;
 
-    public static function getAllSettings(): array
+    public static function getAllSettings(bool $forceFresh = false): array
     {
-        if (self::$cachedSettings !== null) {
+        if (!$forceFresh && self::$cachedSettings !== null) {
             return self::$cachedSettings;
         }
 
