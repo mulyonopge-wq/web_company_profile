@@ -79,6 +79,30 @@ use App\Helpers\UrlHelper;
                 </div>
             </div>
 
+            <div class="card border rounded-4 p-4 shadow-sm bg-white mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-telephone me-2 text-primary"></i>Teks Halaman Kontak (/kontak)</h5>
+                    <a href="<?= UrlHelper::base('kontak') ?>" target="_blank" class="btn btn-outline-info btn-sm rounded-pill px-2 py-0" style="font-size: 0.75rem;">
+                        <i class="bi bi-eye"></i> Lihat
+                    </a>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Label / Badge Seksi</label>
+                    <input type="text" name="contact_page_badge" class="form-control" value="<?= e($settings['contact_page_badge'] ?? 'Bantuan & Layanan') ?>" placeholder="Contoh: Bantuan & Layanan">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Judul Halaman Kontak</label>
+                    <input type="text" name="contact_page_title" class="form-control" value="<?= e($settings['contact_page_title'] ?? 'Hubungi Kami') ?>" placeholder="Contoh: Hubungi Kami">
+                </div>
+
+                <div class="mb-0">
+                    <label class="form-label small fw-semibold">Deskripsi / Sub-judul Kontak</label>
+                    <textarea name="contact_page_subtitle" rows="3" class="form-control" placeholder="Tuliskan keterangan di bawah judul kontak..."><?= e($settings['contact_page_subtitle'] ?? 'Kami siap membantu menjawab kebutuhan teknologi jaringan, stok produk, serta permintaan penawaran harga resmi perusahaan Anda.') ?></textarea>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary rounded-pill px-4 mb-4">
                 <i class="bi bi-floppy-fill me-1"></i> Simpan Pengaturan
             </button>

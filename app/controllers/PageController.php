@@ -6,6 +6,7 @@ namespace App\Controllers;
 use App\Helpers\FlashHelper;
 use App\Helpers\UrlHelper;
 use App\Models\Page;
+use App\Models\Setting;
 use App\Models\Team;
 
 class PageController extends BaseController
@@ -23,8 +24,15 @@ class PageController extends BaseController
 
     public function contact(): void
     {
+        $contactBadge = Setting::get('contact_page_badge', 'Bantuan & Layanan');
+        $contactTitle = Setting::get('contact_page_title', 'Hubungi Kami');
+        $contactSubtitle = Setting::get('contact_page_subtitle', 'Kami siap membantu menjawab kebutuhan teknologi jaringan, stok produk, serta permintaan penawaran harga resmi perusahaan Anda.');
+
         $this->renderView('pages/contact', [
-            'title' => 'Hubungi Kami',
+            'title' => $contactTitle,
+            'contactBadge' => $contactBadge,
+            'contactTitle' => $contactTitle,
+            'contactSubtitle' => $contactSubtitle,
         ]);
     }
 

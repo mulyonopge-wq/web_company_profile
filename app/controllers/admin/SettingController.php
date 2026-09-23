@@ -35,6 +35,9 @@ class SettingController extends AdminBaseController
             'social_youtube',
             'footer_text',
             'footer_copyright',
+            'contact_page_badge',
+            'contact_page_title',
+            'contact_page_subtitle',
         ];
 
         foreach ($fields as $field) {

@@ -3,6 +3,7 @@ use App\Helpers\CsrfHelper;
 use App\Helpers\Sanitizer;
 use App\Helpers\UrlHelper;
 use App\Helpers\WhatsAppHelper;
+use App\Models\Setting;
 
 $companyName = !empty($settings['site_name']) ? $settings['site_name'] : (!empty($settings['company_name']) ? $settings['company_name'] : 'Perusahaan Kami');
 $companyWa = $settings['company_whatsapp'] ?? '081234567890';
@@ -11,6 +12,10 @@ $companyPhone = $settings['company_phone'] ?? '(021) 7890-1234';
 $companyAddress = $settings['company_address'] ?? '';
 $companyHours = $settings['company_hours'] ?? '';
 $maps = $settings['company_maps_embed'] ?? '';
+
+$badge = $contactBadge ?? (class_exists('App\Models\Setting') ? Setting::get('contact_page_badge', 'Bantuan & Layanan') : 'Bantuan & Layanan');
+$pageTitle = $contactTitle ?? (class_exists('App\Models\Setting') ? Setting::get('contact_page_title', 'Hubungi Kami') : 'Hubungi Kami');
+$pageSubtitle = $contactSubtitle ?? (class_exists('App\Models\Setting') ? Setting::get('contact_page_subtitle', 'Kami siap membantu menjawab kebutuhan teknologi jaringan, stok produk, serta permintaan penawaran harga resmi perusahaan Anda.') : 'Kami siap membantu menjawab kebutuhan teknologi jaringan, stok produk, serta permintaan penawaran harga resmi perusahaan Anda.');
 ?>
 
 <!-- Breadcrumb -->
@@ -27,11 +32,15 @@ $maps = $settings['company_maps_embed'] ?? '';
 
 <div class="container pb-5">
     <div class="text-center mb-5">
-        <span class="badge text-bg-primary px-3 py-2 rounded-pill mb-2">Bantuan & Layanan</span>
-        <h1 class="fw-bold text-dark">Hubungi Kami</h1>
-        <p class="text-secondary mx-auto" style="max-width: 600px;">
-            Kami siap membantu menjawab kebutuhan teknologi jaringan, stok produk, serta permintaan penawaran harga resmi perusahaan Anda.
-        </p>
+        <?php if (!empty($badge)): ?>
+            <span class="badge text-bg-primary px-3 py-2 rounded-pill mb-2"><?= e($badge) ?></span>
+        <?php endif; ?>
+        <h1 class="fw-bold text-dark"><?= e($pageTitle) ?></h1>
+        <?php if (!empty($pageSubtitle)): ?>
+            <p class="text-secondary mx-auto" style="max-width: 600px;">
+                <?= nl2br(e($pageSubtitle)) ?>
+            </p>
+        <?php endif; ?>
     </div>
 
     <div class="row g-5">

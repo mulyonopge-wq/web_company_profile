@@ -7,15 +7,23 @@ use App\Helpers\FileUpload;
 use App\Helpers\FlashHelper;
 use App\Helpers\UrlHelper;
 use App\Models\Gallery;
+use App\Models\Setting;
 
 class GalleryController extends AdminBaseController
 {
     public function index(): void
     {
         $galleries = Gallery::all();
+        $galleryBadge = Setting::get('gallery_page_badge', 'Dokumentasi & Portofolio');
+        $galleryTitle = Setting::get('gallery_page_title', 'Galeri Fasilitas & Kegiatan Perusahaan');
+        $gallerySubtitle = Setting::get('gallery_page_subtitle', 'Dokumentasi laboratorium pengujian perangkat, fasilitas gudang logistik, serta implementasi proyek instalasi jaringan bersama klien kami.');
+
         $this->renderAdminView('admin/galleries/index', [
             'title' => 'Kelola Galeri Foto',
             'galleries' => $galleries,
+            'galleryBadge' => $galleryBadge,
+            'galleryTitle' => $galleryTitle,
+            'gallerySubtitle' => $gallerySubtitle,
         ]);
     }
 
@@ -71,6 +79,22 @@ class GalleryController extends AdminBaseController
             FlashHelper::success('Foto galeri berhasil dihapus.');
         }
 
+        UrlHelper::redirect('/admin/galleries');
+    }
+
+    public function updateSettings(): void
+    {
+        $badge = trim($_POST['gallery_page_badge'] ?? '');
+        $title = trim($_POST['gallery_page_title'] ?? '');
+        $subtitle = trim($_POST['gallery_page_subtitle'] ?? '');
+
+        Setting::set('gallery_page_badge', $badge, 'gallery');
+        if (!empty($title)) {
+            Setting::set('gallery_page_title', $title, 'gallery');
+        }
+        Setting::set('gallery_page_subtitle', $subtitle, 'gallery');
+
+        FlashHelper::success('Judul dan kata-kata halaman galeri berhasil diperbarui.');
         UrlHelper::redirect('/admin/galleries');
     }
 }

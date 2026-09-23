@@ -42,6 +42,9 @@ class CompanyController extends AdminBaseController
             'company_team_title',
             'company_team_badge',
             'company_team_subtitle',
+            'contact_page_badge',
+            'contact_page_title',
+            'contact_page_subtitle',
         ];
 
         foreach ($fields as $field) {

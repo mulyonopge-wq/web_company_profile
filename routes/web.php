@@ -123,6 +123,7 @@ Router::get('/admin/galleries', 'Admin\GalleryController@index');
 Router::get('/admin/galleries/create', 'Admin\GalleryController@create');
 Router::post('/admin/galleries/store', 'Admin\GalleryController@store');
 Router::post('/admin/galleries/delete/{id}', 'Admin\GalleryController@delete');
+Router::post('/admin/galleries/settings', 'Admin\GalleryController@updateSettings');
 
 // Users / Admins
 Router::get('/admin/users', 'Admin\UserController@index');

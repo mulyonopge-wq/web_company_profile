@@ -1,6 +1,11 @@
 <?php
 use App\Helpers\Sanitizer;
 use App\Helpers\UrlHelper;
+use App\Models\Setting;
+
+$badge = $galleryBadge ?? (class_exists('App\Models\Setting') ? Setting::get('gallery_page_badge', 'Dokumentasi & Portofolio') : 'Dokumentasi & Portofolio');
+$pageTitle = $galleryTitle ?? (class_exists('App\Models\Setting') ? Setting::get('gallery_page_title', 'Galeri Fasilitas & Kegiatan Perusahaan') : 'Galeri Fasilitas & Kegiatan Perusahaan');
+$pageSubtitle = $gallerySubtitle ?? (class_exists('App\Models\Setting') ? Setting::get('gallery_page_subtitle', 'Dokumentasi laboratorium pengujian perangkat, fasilitas gudang logistik, serta implementasi proyek instalasi jaringan bersama klien kami.') : 'Dokumentasi laboratorium pengujian perangkat, fasilitas gudang logistik, serta implementasi proyek instalasi jaringan bersama klien kami.');
 
 $galleryJson = [];
 if (!empty($galleries)) {
@@ -29,11 +34,15 @@ if (!empty($galleries)) {
 
 <div class="container pb-5">
     <div class="text-center mb-5">
-        <span class="badge text-bg-primary px-3 py-2 rounded-pill mb-2">Dokumentasi & Portofolio</span>
-        <h1 class="fw-bold text-dark">Galeri Fasilitas & Kegiatan Perusahaan</h1>
-        <p class="text-secondary mx-auto" style="max-width: 600px;">
-            Dokumentasi laboratorium pengujian perangkat, fasilitas gudang logistik, serta implementasi proyek instalasi jaringan bersama klien kami.
-        </p>
+        <?php if (!empty($badge)): ?>
+            <span class="badge text-bg-primary px-3 py-2 rounded-pill mb-2"><?= e($badge) ?></span>
+        <?php endif; ?>
+        <h1 class="fw-bold text-dark"><?= e($pageTitle) ?></h1>
+        <?php if (!empty($pageSubtitle)): ?>
+            <p class="text-secondary mx-auto" style="max-width: 600px;">
+                <?= nl2br(e($pageSubtitle)) ?>
+            </p>
+        <?php endif; ?>
     </div>
 
     <?php if (empty($galleries)): ?>

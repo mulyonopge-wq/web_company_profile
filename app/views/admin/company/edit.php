@@ -9,12 +9,15 @@ use App\Helpers\UrlHelper;
         <h3 class="fw-bold text-dark mb-1">Profil Perusahaan</h3>
         <p class="text-secondary small mb-0">Ubah seluruh data identitas, visi misi, dan kontak perusahaan tanpa edit kode.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap">
         <a href="<?= UrlHelper::base('admin/teams') ?>" class="btn btn-outline-success btn-sm rounded-pill px-3">
             <i class="bi bi-people-fill me-1"></i> Kelola Tim & Pengurus
         </a>
         <a href="<?= UrlHelper::base('tentang') ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-            <i class="bi bi-eye me-1"></i> Pratinjau Halaman
+            <i class="bi bi-eye me-1"></i> Pratinjau Tentang Kami
+        </a>
+        <a href="<?= UrlHelper::base('kontak') ?>" target="_blank" class="btn btn-outline-info btn-sm rounded-pill px-3">
+            <i class="bi bi-eye me-1"></i> Pratinjau Kontak
         </a>
     </div>
 </div>
@@ -167,8 +170,36 @@ use App\Helpers\UrlHelper;
                 </div>
             </div>
 
+            <!-- Contact Page Header & Texts -->
+            <div class="card border rounded-4 p-4 shadow-sm bg-white mb-4" id="kontak-teks">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="bi bi-fonts fs-6"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Judul & Keterangan Halaman Kontak</h5>
+                        <small class="text-secondary">Teks pembuka header yang tampil di halaman Hubungi Kami (<code>/kontak</code>).</small>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Label / Badge Seksi</label>
+                    <input type="text" name="contact_page_badge" class="form-control form-control-sm" value="<?= e($company['contact_page_badge'] ?? 'Bantuan & Layanan') ?>" placeholder="Contoh: Bantuan & Layanan">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Judul Halaman Kontak *</label>
+                    <input type="text" name="contact_page_title" class="form-control form-control-sm" value="<?= e($company['contact_page_title'] ?? 'Hubungi Kami') ?>" placeholder="Contoh: Hubungi Kami">
+                </div>
+
+                <div class="mb-0">
+                    <label class="form-label small fw-semibold">Kata-kata Keterangan / Deskripsi Sub-judul</label>
+                    <textarea name="contact_page_subtitle" rows="3" class="form-control form-control-sm" placeholder="Tuliskan keterangan / pengantar di bawah judul..."><?= e($company['contact_page_subtitle'] ?? 'Kami siap membantu menjawab kebutuhan teknologi jaringan, stok produk, serta permintaan penawaran harga resmi perusahaan Anda.') ?></textarea>
+                </div>
+            </div>
+
             <!-- Contacts & Hours -->
-            <div class="card border rounded-4 p-4 shadow-sm bg-white mb-4">
+            <div class="card border rounded-4 p-4 shadow-sm bg-white mb-4" id="kontak">
                 <h5 class="fw-bold mb-3 text-dark">Kontak & Lokasi</h5>
 
                 <div class="mb-3">
