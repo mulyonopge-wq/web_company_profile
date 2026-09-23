@@ -16,8 +16,7 @@ $companyName = $settings['company_name'] ?? 'Admin Panel';
     <script>
         (function() {
             const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
+            const theme = savedTheme ? savedTheme : 'light';
             document.documentElement.setAttribute('data-bs-theme', theme);
         })();
     </script>

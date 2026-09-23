@@ -22,8 +22,7 @@ $favicon = !empty($settings['site_favicon']) ? UrlHelper::upload($settings['site
     <script>
         (function() {
             const saved = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+            const theme = saved ? saved : 'light';
             document.documentElement.setAttribute('data-bs-theme', theme);
         })();
     </script>

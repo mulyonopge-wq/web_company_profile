@@ -216,7 +216,7 @@ function initThemeToggle() {
         if (storedTheme) {
             return storedTheme;
         }
-        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        return 'light';
     };
 
     const updateToggleIcons = (theme) => {
@@ -256,13 +256,4 @@ function initThemeToggle() {
             setTheme(newTheme);
         });
     });
-
-    if (window.matchMedia) {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            const storedTheme = getStoredTheme();
-            if (!storedTheme) {
-                setTheme(getPreferredTheme());
-            }
-        });
-    }
 }
