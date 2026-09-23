@@ -11,7 +11,23 @@ class UrlHelper
     {
         if (self::$baseUrl === null) {
             $config = require dirname(__DIR__, 2) . '/config/config.php';
-            self::$baseUrl = rtrim($config['app']['url'], '/');
+            $configuredUrl = rtrim((string) ($config['app']['url'] ?? ''), '/');
+
+            // If running in web browser with HTTP_HOST
+            if (!empty($_SERVER['HTTP_HOST'])) {
+                // If APP_URL is explicitly configured to a real domain (not default localhost), use it
+                if (!empty($configuredUrl) && !str_contains($configuredUrl, 'localhost')) {
+                    self::$baseUrl = $configuredUrl;
+                } else {
+                    // Auto-detect protocol and current host dynamically (e.g. gambiran.bumdes13.id)
+                    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                        ? 'https' : 'http';
+                    self::$baseUrl = "{$protocol}://{$_SERVER['HTTP_HOST']}";
+                }
+            } else {
+                self::$baseUrl = !empty($configuredUrl) ? $configuredUrl : 'http://localhost:8000';
+            }
         }
         return self::$baseUrl;
     }

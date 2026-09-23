@@ -12,7 +12,7 @@ return [
         'version' => '1.0.0',
         'env' => Env::get('APP_ENV', 'production'),
         'debug' => (bool) Env::get('APP_DEBUG', false),
-        'url' => rtrim((string) Env::get('APP_URL', 'http://localhost/web-company-profile/public'), '/'),
+        'url' => rtrim((string) Env::get('APP_URL', 'http://localhost:8000'), '/'),
         'timezone' => 'Asia/Jakarta',
         'locale' => 'id_ID',
         'currency' => 'Rp',
