@@ -114,6 +114,66 @@ use App\Helpers\UrlHelper;
                     <textarea name="company_team_subtitle" rows="3" class="form-control"><?= e($company['company_team_subtitle'] ?? 'Kelola daftar jajaran pimpinan, dewan direksi, dan pengurus perusahaan yang tampil di halaman profil (Tentang Kami).') ?></textarea>
                 </div>
             </div>
+
+            <!-- Card Penawaran Khusus Bisnis (B2B) -->
+            <div class="card border rounded-4 p-4 shadow-sm bg-white mb-4" id="penawaran-bisnis">
+                <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="bi bi-briefcase-fill fs-5 text-dark"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Card Penawaran Khusus Bisnis (B2B)</h5>
+                            <small class="text-secondary">Banner promosi penawaran khusus / pengadaan yang tampil di halaman Beranda.</small>
+                        </div>
+                    </div>
+                    <div>
+                        <select name="promo_card_enabled" class="form-select form-select-sm fw-semibold">
+                            <option value="1" <?= ($company['promo_card_enabled'] ?? '1') !== '0' ? 'selected' : '' ?>>Tampilkan</option>
+                            <option value="0" <?= ($company['promo_card_enabled'] ?? '1') === '0' ? 'selected' : '' ?>>Sembunyikan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-5">
+                        <label class="form-label small fw-semibold">Label Badge</label>
+                        <input type="text" name="promo_card_badge" class="form-control" value="<?= e($company['promo_card_badge'] ?? 'PENAWARAN KHUSUS BISNIS') ?>" placeholder="Contoh: PENAWARAN KHUSUS BISNIS">
+                    </div>
+                    <div class="col-md-7">
+                        <label class="form-label small fw-semibold">Judul Utama Penawaran *</label>
+                        <input type="text" name="promo_card_title" class="form-control" value="<?= e($company['promo_card_title'] ?? 'Butuh Pengadaan Perangkat Kantor Skala Besar?') ?>" placeholder="Contoh: Butuh Pengadaan Perangkat Kantor Skala Besar?">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Deskripsi / Keterangan Penawaran</label>
+                    <textarea name="promo_card_desc" rows="2" class="form-control" placeholder="Contoh: Dapatkan penawaran harga khusus (B2B corporate rate) dengan invoice resmi dan dukungan teknis langsung."><?= e($company['promo_card_desc'] ?? 'Dapatkan penawaran harga khusus (B2B corporate rate) dengan invoice resmi dan dukungan teknis langsung.') ?></textarea>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold"><i class="bi bi-whatsapp text-success me-1"></i> Teks Tombol WhatsApp</label>
+                        <input type="text" name="promo_card_btn_wa_text" class="form-control" value="<?= e($company['promo_card_btn_wa_text'] ?? 'Minta Penawaran Harga') ?>" placeholder="Minta Penawaran Harga">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold"><i class="bi bi-chat-text me-1"></i> Template Pesan WhatsApp Otomatis</label>
+                        <input type="text" name="promo_card_wa_message" class="form-control" value="<?= e($company['promo_card_wa_message'] ?? 'Halo Admin, saya ingin meminta penawaran harga pengadaan perangkat IT kantor untuk perusahaan.') ?>" placeholder="Pesan otomatis saat user klik tombol WA">
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold"><i class="bi bi-link-45deg me-1"></i> Teks Tombol Sekunder</label>
+                        <input type="text" name="promo_card_btn_secondary_text" class="form-control" value="<?= e($company['promo_card_btn_secondary_text'] ?? 'Kontak Perusahaan') ?>" placeholder="Kontak Perusahaan">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Link Tujuan Tombol Sekunder</label>
+                        <input type="text" name="promo_card_btn_secondary_url" class="form-control" value="<?= e($company['promo_card_btn_secondary_url'] ?? 'kontak') ?>" placeholder="kontak">
+                        <small class="text-muted">Isi dengan slug seperti <code>kontak</code> atau URL lengkap.</small>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Contact & Media Sidebar -->
@@ -146,17 +206,17 @@ use App\Helpers\UrlHelper;
 
             <!-- About Page Media & Badge -->
             <div class="card border rounded-4 p-4 shadow-sm bg-white mb-4">
-                <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-image me-2 text-primary"></i>Foto Halaman Tentang Kami</h5>
+                <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-image me-2 text-primary"></i>Foto & Badge Profil (Beranda & Tentang Kami)</h5>
 
                 <div class="mb-3">
-                    <label class="form-label small fw-semibold">Foto Tentang Kami</label>
+                    <label class="form-label small fw-semibold">Foto Profil / Tentang Kami</label>
                     <?php if (!empty($company['company_about_image'])): ?>
                         <div class="mb-2 p-2 bg-light border rounded text-center">
                             <img src="<?= UrlHelper::upload($company['company_about_image']) ?>" alt="About Photo" class="img-fluid rounded" style="max-height: 140px;">
                         </div>
                     <?php endif; ?>
                     <input type="file" name="company_about_image" class="form-control form-control-sm" accept="image/png, image/jpeg, image/webp">
-                    <small class="text-muted">Format: JPG, PNG, WEBP (Rekomendasi 800x500px).</small>
+                    <small class="text-muted">Format: JPG, PNG, WEBP (Rekomendasi 800x500px). Foto ini ditampilkan pada bagian Tentang Perusahaan di halaman Beranda &amp; Tentang Kami.</small>
                 </div>
 
                 <div class="mb-3">

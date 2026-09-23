@@ -8,6 +8,9 @@ $companyName = !empty($settings['site_name']) ? $settings['site_name'] : (!empty
 $companySlogan = $settings['company_slogan'] ?? '';
 $companyShortDesc = $settings['company_short_description'] ?? '';
 $companyWa = $settings['company_whatsapp'] ?? '081234567890';
+$aboutHomeImage = !empty($settings['company_about_image']) ? UrlHelper::upload($settings['company_about_image']) : 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80';
+$badgeTitle = !empty($settings['company_badge_title']) ? $settings['company_badge_title'] : 'Infrastruktur Berstandar Enterprise';
+$badgeDesc = !empty($settings['company_badge_desc']) ? $settings['company_badge_desc'] : 'Siap mendukung pertumbuhan jaringan kantor dan bisnis Anda.';
 ?>
 
 <!-- Schema.org Organization -->
@@ -144,10 +147,10 @@ $companyWa = $settings['company_whatsapp'] ?? '081234567890';
             </div>
             <div class="col-lg-6">
                 <div class="position-relative">
-                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80" alt="Networking Server" class="img-fluid rounded-4 shadow-lg w-100" style="max-height: 400px; object-fit: cover;" loading="lazy">
+                    <img src="<?= e($aboutHomeImage) ?>" alt="<?= e($badgeTitle) ?>" class="img-fluid rounded-4 shadow-lg w-100" style="max-height: 400px; object-fit: cover;" loading="lazy">
                     <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-90 text-white p-4 rounded-bottom-4 w-100">
-                        <h6 class="fw-bold mb-1 text-white">Infrastruktur Berstandar Enterprise</h6>
-                        <small class="text-secondary">Siap mendukung pertumbuhan jaringan kantor dan bisnis Anda.</small>
+                        <h6 class="fw-bold mb-1 text-white"><?= e($badgeTitle) ?></h6>
+                        <small class="text-secondary"><?= e($badgeDesc) ?></small>
                     </div>
                 </div>
             </div>
@@ -252,20 +255,37 @@ $companyWa = $settings['company_whatsapp'] ?? '081234567890';
 <?php endif; ?>
 
 <!-- Promotional Banner -->
+<?php
+$promoEnabled = ($settings['promo_card_enabled'] ?? '1') !== '0';
+$promoBadge = $settings['promo_card_badge'] ?? 'PENAWARAN KHUSUS BISNIS';
+$promoTitle = $settings['promo_card_title'] ?? 'Butuh Pengadaan Perangkat Kantor Skala Besar?';
+$promoDesc = $settings['promo_card_desc'] ?? 'Dapatkan penawaran harga khusus (B2B corporate rate) dengan invoice resmi dan dukungan teknis langsung.';
+$promoBtnWaText = $settings['promo_card_btn_wa_text'] ?? 'Minta Penawaran Harga';
+$promoWaMessage = $settings['promo_card_wa_message'] ?? 'Halo Admin, saya ingin meminta penawaran harga pengadaan perangkat IT kantor untuk perusahaan.';
+$promoBtnSecondaryText = $settings['promo_card_btn_secondary_text'] ?? 'Kontak Perusahaan';
+$promoBtnSecondaryUrl = $settings['promo_card_btn_secondary_url'] ?? 'kontak';
+?>
+<?php if ($promoEnabled): ?>
 <section class="container mb-5">
     <div class="p-4 p-md-5 rounded-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <span class="badge text-bg-warning px-3 py-2 rounded-pill fw-bold mb-3">PENAWARAN KHUSUS BISNIS</span>
-                <h2 class="display-6 fw-bold mb-3">Butuh Pengadaan Perangkat Kantor Skala Besar?</h2>
-                <p class="text-light text-opacity-75 lead mb-4">Dapatkan penawaran harga khusus (B2B corporate rate) dengan invoice resmi dan dukungan teknis langsung.</p>
+                <?php if (!empty($promoBadge)): ?>
+                    <span class="badge text-bg-warning px-3 py-2 rounded-pill fw-bold mb-3"><?= e($promoBadge) ?></span>
+                <?php endif; ?>
+                <h2 class="display-6 fw-bold mb-3"><?= e($promoTitle) ?></h2>
+                <p class="text-light text-opacity-75 lead mb-4"><?= e($promoDesc) ?></p>
                 <div class="d-flex flex-wrap gap-3">
-                    <a href="<?= WhatsAppHelper::getContactLink($companyWa, "Halo Admin, saya ingin meminta penawaran harga pengadaan perangkat IT kantor untuk perusahaan.") ?>" target="_blank" class="btn btn-success btn-lg rounded-pill px-4">
-                        <i class="bi bi-whatsapp me-2"></i> Minta Penawaran Harga
-                    </a>
-                    <a href="<?= UrlHelper::base('kontak') ?>" class="btn btn-outline-light btn-lg rounded-pill px-4">
-                        Kontak Perusahaan
-                    </a>
+                    <?php if (!empty($promoBtnWaText)): ?>
+                        <a href="<?= WhatsAppHelper::getContactLink($companyWa, $promoWaMessage) ?>" target="_blank" class="btn btn-success btn-lg rounded-pill px-4">
+                            <i class="bi bi-whatsapp me-2"></i> <?= e($promoBtnWaText) ?>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (!empty($promoBtnSecondaryText)): ?>
+                        <a href="<?= UrlHelper::base($promoBtnSecondaryUrl) ?>" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                            <?= e($promoBtnSecondaryText) ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="col-lg-4 text-center d-none d-lg-block">
@@ -274,6 +294,7 @@ $companyWa = $settings['company_whatsapp'] ?? '081234567890';
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <!-- Latest Articles -->
 <?php if (!empty($latestArticles)): ?>
