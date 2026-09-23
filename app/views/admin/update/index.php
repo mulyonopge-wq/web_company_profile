@@ -138,8 +138,12 @@ use App\Helpers\UrlHelper;
     </div>
     <div class="card-body p-4">
         <p class="text-secondary small mb-2">Jika Anda lebih menyukai menggunakan Terminal aaPanel / SSH secara langsung, jalankan perintah berikut:</p>
-        <div class="bg-light p-3 rounded-3 position-relative font-monospace small">
+        <div class="bg-light p-3 rounded-3 position-relative font-monospace small mb-3">
             <code>cd <?= e($repoPath ?? '/www/wwwroot/gambiran.bumdes13.id') ?><br>git pull origin main</code>
+        </div>
+        <p class="text-secondary small mb-2"><i class="bi bi-shield-lock-fill text-warning me-1"></i>Jika muncul kendala <code>Permission denied (.git/FETCH_HEAD)</code> saat klik tombol update, berikan izin ke user <code>www</code>:</p>
+        <div class="bg-light p-3 rounded-3 position-relative font-monospace small">
+            <code>chown -R www:www <?= e($repoPath ?? '/www/wwwroot/gambiran.bumdes13.id') ?></code>
         </div>
     </div>
 </div>

@@ -148,7 +148,11 @@ class UpdateController extends AdminBaseController
             if ($result['success']) {
                 FlashHelper::success('Pembaruan dari GitHub berhasil ditarik dan diterapkan ke aplikasi!');
             } else {
-                FlashHelper::warning('Git pull gagal diterapkan. Jika terjadi konflik file lokal, gunakan opsi "Reset Paksa ke Versi GitHub".');
+                if (str_contains($result['output'], 'Permission denied') || str_contains($result['output'], 'FETCH_HEAD')) {
+                    FlashHelper::danger('Izin akses ditolak (Permission denied): Folder .git dimiliki oleh user root. Silakan jalankan perintah <code>chown -R www:www ' . htmlspecialchars($this->repoPath, ENT_QUOTES, 'UTF-8') . '</code> di Terminal aaPanel Anda.');
+                } else {
+                    FlashHelper::warning('Git pull gagal diterapkan. Jika terjadi konflik file lokal, gunakan opsi "Reset Paksa ke Versi GitHub".');
+                }
             }
         } catch (Throwable $e) {
             FlashHelper::danger('Error saat menarik pembaruan: ' . $e->getMessage());
@@ -183,7 +187,11 @@ class UpdateController extends AdminBaseController
             if ($reset['success']) {
                 FlashHelper::success('Kode program berhasil disinkronkan 100% dengan GitHub repository (file .env & folder upload tetap aman)!');
             } else {
-                FlashHelper::danger('Gagal melakukan reset paksa. Silakan cek pesan log terminal di bawah.');
+                if (str_contains($combinedOutput, 'Permission denied') || str_contains($combinedOutput, 'FETCH_HEAD')) {
+                    FlashHelper::danger('Izin akses ditolak (Permission denied): Folder .git dimiliki oleh user root. Silakan jalankan perintah <code>chown -R www:www ' . htmlspecialchars($this->repoPath, ENT_QUOTES, 'UTF-8') . '</code> di Terminal aaPanel Anda.');
+                } else {
+                    FlashHelper::danger('Gagal melakukan reset paksa. Silakan cek pesan log terminal di bawah.');
+                }
             }
         } catch (Throwable $e) {
             FlashHelper::danger('Error saat reset paksa: ' . $e->getMessage());
