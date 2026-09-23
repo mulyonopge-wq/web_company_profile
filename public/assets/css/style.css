@@ -85,18 +85,20 @@ main {
 }
 
 .hero-title {
+  color: #ffffff !important;
   font-size: 2.5rem;
   font-weight: 800;
   line-height: 1.2;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
 }
 
 .hero-subtitle {
   font-size: 1.15rem;
   font-weight: 400;
-  color: #e2e8f0;
+  color: #f8fafc !important;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
 }
 
 @media (max-width: 768px) {
@@ -431,6 +433,15 @@ footer .footer-title {
 
 [data-bs-theme="dark"] .text-dark {
   color: #f9fafb !important;
+}
+
+[data-bs-theme="dark"] .hero-title {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+[data-bs-theme="dark"] .hero-subtitle {
+  color: #f1f5f9 !important;
 }
 
 [data-bs-theme="dark"] .text-secondary {

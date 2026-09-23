@@ -32,8 +32,8 @@ $companyWa = $settings['company_whatsapp'] ?? '081234567890';
                     <?php endif; ?>
                     <div class="carousel-caption">
                         <span class="badge text-bg-primary px-3 py-2 mb-2 rounded-pill fw-semibold">Official Partner & Distributor</span>
-                        <h1 class="hero-title"><?= e($b['title']) ?></h1>
-                        <p class="hero-subtitle"><?= e($b['subtitle']) ?></p>
+                        <h1 class="hero-title text-white fw-bold"><?= e($b['title']) ?></h1>
+                        <p class="hero-subtitle text-white"><?= e($b['subtitle']) ?></p>
                         <div class="d-flex flex-wrap gap-3">
                             <a href="<?= UrlHelper::base($b['button_url'] ?? '/produk') ?>" class="btn btn-primary btn-lg rounded-pill px-4 shadow">
                                 <i class="bi bi-box-seam me-1"></i> <?= e($b['button_text'] ?? 'Lihat Produk') ?>
