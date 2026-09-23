@@ -29,16 +29,28 @@ spl_autoload_register(function (string $class) {
         }
 
         $relativeClass = substr($class, $len);
-        $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
 
+        // 1. Try exact path match
+        $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
         if (file_exists($file)) {
             require $file;
+            return;
+        }
+
+        // 2. Try lowercase directory paths for Linux / case-sensitive OS (e.g. Helpers/Env -> helpers/Env)
+        $parts = explode('\\', $relativeClass);
+        $className = array_pop($parts);
+        $subDir = !empty($parts) ? strtolower(implode('/', $parts)) . '/' : '';
+        $fileLowerDir = $baseDir . $subDir . $className . '.php';
+        if (file_exists($fileLowerDir)) {
+            require $fileLowerDir;
             return;
         }
     }
 });
 
 // 2. Load Helpers & Functions
+require_once dirname(__DIR__) . '/app/helpers/Env.php';
 require_once dirname(__DIR__) . '/app/helpers/Sanitizer.php';
 require_once dirname(__DIR__) . '/app/helpers/UrlHelper.php';
 require_once dirname(__DIR__) . '/app/helpers/functions.php';
