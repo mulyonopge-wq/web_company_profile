@@ -75,7 +75,7 @@ class UpdateController extends AdminBaseController
 
     public function check(): void
     {
-        CsrfHelper::verify();
+        CsrfHelper::verifyPost();
 
         if (!$this->isExecEnabled()) {
             FlashHelper::danger('Fungsi shell_exec / exec dinonaktifkan di konfigurasi PHP server.');
@@ -114,7 +114,7 @@ class UpdateController extends AdminBaseController
 
     public function pull(): void
     {
-        CsrfHelper::verify();
+        CsrfHelper::verifyPost();
 
         if (!$this->isExecEnabled()) {
             FlashHelper::danger('Fungsi shell_exec / exec dinonaktifkan di konfigurasi PHP server.');
@@ -143,7 +143,7 @@ class UpdateController extends AdminBaseController
 
     public function resetHard(): void
     {
-        CsrfHelper::verify();
+        CsrfHelper::verifyPost();
 
         if (!$this->isExecEnabled()) {
             FlashHelper::danger('Fungsi shell_exec / exec dinonaktifkan di konfigurasi PHP server.');

@@ -54,4 +54,9 @@ class CsrfHelper
             }
         }
     }
+
+    public static function verify(): void
+    {
+        self::verifyPost();
+    }
 }
