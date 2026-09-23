@@ -9,6 +9,22 @@ $effectivePrice = ($product['discount_price'] > 0) ? $product['discount_price'] 
 $hasDiscount = ($product['discount_price'] > 0);
 $discountPercent = $hasDiscount ? round((($product['price'] - $product['discount_price']) / $product['price']) * 100) : 0;
 $productUrl = UrlHelper::base('produk/' . $product['slug']);
+
+// Siapkan daftar seluruh gambar produk untuk preview & lightbox
+$productImagesList = [];
+if (!empty($product['main_image'])) {
+    $productImagesList[] = UrlHelper::upload($product['main_image']);
+}
+if (!empty($galleryImages)) {
+    foreach ($galleryImages as $gImg) {
+        if (!empty($gImg['image_path'])) {
+            $productImagesList[] = UrlHelper::upload($gImg['image_path']);
+        }
+    }
+}
+if (empty($productImagesList)) {
+    $productImagesList[] = UrlHelper::upload($product['main_image'], 'assets/images/no-image.png');
+}
 ?>
 
 <!-- Schema.org Product -->
@@ -35,11 +51,14 @@ $productUrl = UrlHelper::base('produk/' . $product['slug']);
         <!-- Images & Gallery -->
         <div class="col-lg-5">
             <div class="card border rounded-4 p-3 bg-white shadow-sm mb-3">
-                <div class="d-flex align-items-center justify-content-center position-relative" style="min-height: 340px; max-height: 400px; overflow: hidden;">
-                    <img id="mainProductView" src="<?= UrlHelper::upload($product['main_image'], 'assets/images/no-image.png') ?>" alt="<?= e($product['name']) ?>" class="img-fluid object-fit-contain" style="max-height: 380px;">
+                <div class="d-flex align-items-center justify-content-center position-relative product-main-img-box cursor-pointer" style="min-height: 340px; max-height: 400px; overflow: hidden; cursor: zoom-in;" onclick="openProductLightbox()" title="Klik untuk memperbesar gambar">
+                    <img id="mainProductView" src="<?= $productImagesList[0] ?>" alt="<?= e($product['name']) ?>" class="img-fluid object-fit-contain transition-all" style="max-height: 380px;">
                     <?php if ($hasDiscount): ?>
                         <span class="product-badge-discount">HEMAT <?= $discountPercent ?>%</span>
                     <?php endif; ?>
+                    <button type="button" class="btn btn-sm btn-light border shadow-sm position-absolute bottom-0 end-0 m-3 rounded-pill px-3 py-1 d-flex align-items-center gap-1 opacity-90" style="font-size: 0.8rem; pointer-events: none;">
+                        <i class="bi bi-arrows-fullscreen text-primary"></i> <span class="fw-semibold">Perbesar</span>
+                    </button>
                 </div>
             </div>
 
@@ -49,12 +68,14 @@ $productUrl = UrlHelper::base('produk/' . $product['slug']);
             ?>
             <?php if (!empty($galleryImages) || $hasVideo): ?>
                 <div class="d-flex gap-2 overflow-x-auto pb-2">
-                    <div class="border rounded-3 p-1 cursor-pointer thumb-item active" style="width: 70px; height: 70px; flex-shrink: 0;" onclick="changeMainImage('<?= UrlHelper::upload($product['main_image']) ?>', this)">
-                        <img src="<?= UrlHelper::upload($product['main_image']) ?>" class="w-100 h-100 object-fit-contain">
+                    <div class="border border-primary rounded-3 p-1 cursor-pointer thumb-item active" data-index="0" style="width: 70px; height: 70px; flex-shrink: 0;" onclick="changeMainImage(0)">
+                        <img src="<?= $productImagesList[0] ?>" class="w-100 h-100 object-fit-contain">
                     </div>
                     <?php if (!empty($galleryImages)): ?>
-                        <?php foreach ($galleryImages as $img): ?>
-                            <div class="border rounded-3 p-1 cursor-pointer thumb-item" style="width: 70px; height: 70px; flex-shrink: 0;" onclick="changeMainImage('<?= UrlHelper::upload($img['image_path']) ?>', this)">
+                        <?php foreach ($galleryImages as $idx => $img): 
+                            $imgIdx = $idx + 1;
+                        ?>
+                            <div class="border rounded-3 p-1 cursor-pointer thumb-item" data-index="<?= $imgIdx ?>" style="width: 70px; height: 70px; flex-shrink: 0;" onclick="changeMainImage(<?= $imgIdx ?>)">
                                 <img src="<?= UrlHelper::upload($img['image_path']) ?>" class="w-100 h-100 object-fit-contain">
                             </div>
                         <?php endforeach; ?>
@@ -353,12 +374,250 @@ $productUrl = UrlHelper::base('produk/' . $product['slug']);
 </div>
 <?php endif; ?>
 
-<script>
-function changeMainImage(url, el) {
-    document.getElementById('mainProductView').src = url;
-    document.querySelectorAll('.thumb-item').forEach(i => i.classList.remove('border-primary'));
-    el.classList.add('border-primary');
+<!-- Modal Lightbox Pop-up Gambar Produk dengan Tombol Geser / Next -->
+<div class="modal fade modal-product-lightbox" id="productImageModal" tabindex="-1" aria-labelledby="productImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-md-down">
+        <div class="modal-content bg-dark border-0 shadow-2xl rounded-4 overflow-hidden position-relative" style="background-color: rgba(15, 20, 28, 0.96) !important; backdrop-filter: blur(12px);">
+            <!-- Header Modal -->
+            <div class="modal-header border-0 py-3 px-4 d-flex justify-content-between align-items-center bg-transparent">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-primary px-3 py-2 rounded-pill font-monospace fs-6">
+                        <i class="bi bi-images me-1"></i> <span id="lightboxCurrentNum">1</span> / <span id="lightboxTotalNum"><?= count($productImagesList) ?></span>
+                    </span>
+                    <h6 class="modal-title fw-bold text-white text-truncate mb-0" style="max-width: 420px;" id="productImageModalLabel">
+                        <?= e($product['name']) ?>
+                    </h6>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" data-bs-dismiss="modal" aria-label="Tutup" style="width: 38px; height: 38px;" title="Tutup (Esc)">
+                        <i class="bi bi-x-lg fs-6"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Body Modal (Gambar & Tombol Geser Kiri-Kanan) -->
+            <div class="modal-body p-0 d-flex align-items-center justify-content-center position-relative" style="min-height: 420px; max-height: 74vh; overflow: hidden; user-select: none;">
+                <?php if (count($productImagesList) > 1): ?>
+                <!-- Tombol Geser Kiri / Prev -->
+                <button type="button" class="btn-lightbox-nav btn-lightbox-prev position-absolute start-0 top-50 translate-middle-y ms-3 z-3 shadow" onclick="prevLightboxImage()" aria-label="Gambar Sebelumnya" title="Sebelumnya (Geser Kiri / Panah Kiri)">
+                    <i class="bi bi-chevron-left fs-3"></i>
+                </button>
+                <?php endif; ?>
+
+                <!-- Kontainer Gambar Pop-up -->
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center p-3 text-center">
+                    <img id="lightboxImage" src="<?= $productImagesList[0] ?>" alt="<?= e($product['name']) ?>" class="img-fluid object-fit-contain shadow-sm" style="max-height: 70vh; max-width: 100%; border-radius: 12px; transition: transform 0.25s ease, opacity 0.2s ease;">
+                </div>
+
+                <?php if (count($productImagesList) > 1): ?>
+                <!-- Tombol Geser Kanan / Next -->
+                <button type="button" class="btn-lightbox-nav btn-lightbox-next position-absolute end-0 top-50 translate-middle-y me-3 z-3 shadow" onclick="nextLightboxImage()" aria-label="Gambar Berikutnya" title="Berikutnya (Geser Kanan / Panah Kanan)">
+                    <i class="bi bi-chevron-right fs-3"></i>
+                </button>
+                <?php endif; ?>
+            </div>
+
+            <!-- Footer Modal (Baris Thumbnail & Indikator) -->
+            <?php if (count($productImagesList) > 1): ?>
+            <div class="modal-footer border-0 py-3 px-4 justify-content-center bg-black bg-opacity-50">
+                <div class="d-flex gap-2 overflow-x-auto justify-content-center py-1" style="max-width: 100%;">
+                    <?php foreach ($productImagesList as $idx => $imgUrl): ?>
+                        <div class="lightbox-thumb border rounded-3 p-1 cursor-pointer <?= $idx === 0 ? 'border-primary active shadow' : 'border-secondary opacity-60' ?>" style="width: 58px; height: 58px; flex-shrink: 0; transition: all 0.2s;" onclick="setLightboxImage(<?= $idx ?>)">
+                            <img src="<?= $imgUrl ?>" class="w-100 h-100 object-fit-contain rounded-1" alt="Thumbnail <?= $idx + 1 ?>">
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<style>
+.product-main-img-box {
+    transition: transform 0.2s ease;
 }
+.product-main-img-box:hover #mainProductView {
+    transform: scale(1.02);
+}
+.btn-lightbox-nav {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+}
+.btn-lightbox-nav:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: #ffffff;
+    transform: translateY(-50%) scale(1.12);
+    box-shadow: 0 0 20px rgba(13, 110, 253, 0.6);
+}
+.btn-lightbox-nav:active {
+    transform: translateY(-50%) scale(0.92);
+}
+.lightbox-thumb {
+    transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+.lightbox-thumb:hover {
+    opacity: 1 !important;
+    transform: scale(1.06);
+}
+.lightbox-thumb.active {
+    border-color: #0d6efd !important;
+    border-width: 2px !important;
+    opacity: 1 !important;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
+}
+@media (max-width: 768px) {
+    .btn-lightbox-nav {
+        width: 42px;
+        height: 42px;
+    }
+    .btn-lightbox-nav i {
+        font-size: 1.25rem !important;
+    }
+}
+</style>
+
+<script>
+const productImages = <?= json_encode($productImagesList) ?>;
+let currentImageIndex = 0;
+
+function changeMainImage(index) {
+    if (typeof index === 'string') {
+        const found = productImages.indexOf(index);
+        index = found !== -1 ? found : 0;
+    }
+    if (index < 0 || index >= productImages.length) return;
+    
+    currentImageIndex = index;
+    const mainImg = document.getElementById('mainProductView');
+    if (mainImg) {
+        mainImg.src = productImages[currentImageIndex];
+    }
+    
+    // Highlight thumbnail aktif di halaman utama
+    document.querySelectorAll('.thumb-item').forEach((item) => {
+        if (!item.classList.contains('thumb-video')) {
+            const itemIdx = parseInt(item.getAttribute('data-index'));
+            if (itemIdx === currentImageIndex) {
+                item.classList.add('border-primary', 'active');
+            } else {
+                item.classList.remove('border-primary', 'active');
+            }
+        }
+    });
+}
+
+function openProductLightbox(startIndex = null) {
+    if (startIndex !== null && startIndex >= 0 && startIndex < productImages.length) {
+        currentImageIndex = startIndex;
+    }
+    setLightboxImage(currentImageIndex);
+    
+    const modalEl = document.getElementById('productImageModal');
+    if (modalEl) {
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    }
+}
+
+function setLightboxImage(index) {
+    if (!productImages || productImages.length === 0) return;
+    
+    if (index < 0) {
+        index = productImages.length - 1;
+    } else if (index >= productImages.length) {
+        index = 0;
+    }
+    
+    currentImageIndex = index;
+    
+    const lightboxImg = document.getElementById('lightboxImage');
+    if (lightboxImg) {
+        lightboxImg.style.opacity = '0.4';
+        lightboxImg.src = productImages[currentImageIndex];
+        lightboxImg.onload = () => {
+            lightboxImg.style.opacity = '1';
+        };
+    }
+    
+    const currentNumEl = document.getElementById('lightboxCurrentNum');
+    if (currentNumEl) {
+        currentNumEl.textContent = (currentImageIndex + 1);
+    }
+    
+    // Update highlight thumbnail di dalam modal popup
+    document.querySelectorAll('.lightbox-thumb').forEach((thumb, idx) => {
+        if (idx === currentImageIndex) {
+            thumb.classList.add('border-primary', 'active');
+            thumb.classList.remove('border-secondary', 'opacity-60');
+            thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+            thumb.classList.remove('border-primary', 'active');
+            thumb.classList.add('border-secondary', 'opacity-60');
+        }
+    });
+    
+    // Sinkronkan gambar di halaman utama
+    changeMainImage(currentImageIndex);
+}
+
+function nextLightboxImage() {
+    setLightboxImage(currentImageIndex + 1);
+}
+
+function prevLightboxImage() {
+    setLightboxImage(currentImageIndex - 1);
+}
+
+// Navigasi keyboard (Panah Kiri & Panah Kanan)
+document.addEventListener('keydown', (e) => {
+    const modalEl = document.getElementById('productImageModal');
+    if (modalEl && modalEl.classList.contains('show')) {
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            prevLightboxImage();
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            nextLightboxImage();
+        }
+    }
+});
+
+// Navigasi swipe layar sentuh di HP/Mobile
+document.addEventListener('DOMContentLoaded', () => {
+    const lightboxContainer = document.querySelector('#productImageModal .modal-body');
+    if (lightboxContainer) {
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        lightboxContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        lightboxContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 45) {
+                // Geser ke kiri -> Gambar Selanjutnya
+                nextLightboxImage();
+            } else if (touchEndX - touchStartX > 45) {
+                // Geser ke kanan -> Gambar Sebelumnya
+                prevLightboxImage();
+            }
+        }, { passive: true });
+    }
+});
 
 function adjustQty(amount) {
     const input = document.getElementById('detailQtyInput');
