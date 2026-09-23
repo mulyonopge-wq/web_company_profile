@@ -29,47 +29,54 @@ class CategoryController extends AdminBaseController
 
     public function store(): void
     {
-        $name = trim($_POST['name'] ?? '');
-        $slug = trim($_POST['slug'] ?? '');
-        $sortOrder = (int) ($_POST['sort_order'] ?? 0);
-        $isActive = isset($_POST['is_active']) ? 1 : 0;
+        try {
+            $name = trim($_POST['name'] ?? '');
+            $slug = trim($_POST['slug'] ?? '');
+            $sortOrder = (int) ($_POST['sort_order'] ?? 0);
+            $isActive = isset($_POST['is_active']) ? 1 : 0;
 
-        if (empty($name)) {
-            FlashHelper::error('Nama kategori wajib diisi.');
-            UrlHelper::redirect('/admin/categories/create');
-            return;
-        }
-
-        if (empty($slug)) {
-            $slug = Sanitizer::slugify($name);
-        } else {
-            $slug = Sanitizer::slugify($slug);
-        }
-
-        // Check unique slug
-        $existing = Category::findBySlug($slug);
-        if ($existing) {
-            $slug .= '-' . time();
-        }
-
-        $iconPath = '';
-        if (!empty($_FILES['icon_image']['name'])) {
-            $upload = FileUpload::upload($_FILES['icon_image'], 'categories');
-            if ($upload['success']) {
-                $iconPath = $upload['path'];
+            if (empty($name)) {
+                FlashHelper::error('Nama kategori wajib diisi.');
+                UrlHelper::redirect('/admin/categories/create');
+                return;
             }
+
+            if (empty($slug)) {
+                $slug = Sanitizer::slugify($name);
+            } else {
+                $slug = Sanitizer::slugify($slug);
+            }
+
+            // Check unique slug
+            $existing = Category::findBySlug($slug);
+            if ($existing) {
+                $slug .= '-' . time();
+            }
+
+            $iconPath = '';
+            if (!empty($_FILES['icon_image']['name'])) {
+                $upload = FileUpload::upload($_FILES['icon_image'], 'categories');
+                if ($upload['success']) {
+                    $iconPath = $upload['path'];
+                } else {
+                    FlashHelper::warning('Gagal upload ikon: ' . $upload['error']);
+                }
+            }
+
+            Category::create([
+                'name' => $name,
+                'slug' => $slug,
+                'icon_image' => $iconPath ?: null,
+                'sort_order' => $sortOrder,
+                'is_active' => $isActive,
+            ]);
+
+            FlashHelper::success("Kategori \"{$name}\" berhasil ditambahkan.");
+            UrlHelper::redirect('/admin/categories');
+        } catch (\Throwable $e) {
+            FlashHelper::error('Gagal menambahkan kategori: ' . $e->getMessage());
+            UrlHelper::redirect('/admin/categories/create');
         }
-
-        Category::create([
-            'name' => $name,
-            'slug' => $slug,
-            'icon_image' => $iconPath,
-            'sort_order' => $sortOrder,
-            'is_active' => $isActive,
-        ]);
-
-        FlashHelper::success("Kategori \"{$name}\" berhasil ditambahkan.");
-        UrlHelper::redirect('/admin/categories');
     }
 
     public function edit(string|int $id): void
@@ -89,44 +96,51 @@ class CategoryController extends AdminBaseController
 
     public function update(string|int $id): void
     {
-        $category = Category::findById((int) $id);
-        if (!$category) {
-            FlashHelper::error('Kategori tidak ditemukan.');
-            UrlHelper::redirect('/admin/categories');
-            return;
-        }
-
-        $name = trim($_POST['name'] ?? '');
-        $slug = trim($_POST['slug'] ?? '');
-        $sortOrder = (int) ($_POST['sort_order'] ?? 0);
-        $isActive = isset($_POST['is_active']) ? 1 : 0;
-
-        if (empty($slug)) {
-            $slug = Sanitizer::slugify($name);
-        } else {
-            $slug = Sanitizer::slugify($slug);
-        }
-
-        $updateData = [
-            'name' => $name,
-            'slug' => $slug,
-            'sort_order' => $sortOrder,
-            'is_active' => $isActive,
-        ];
-
-        if (!empty($_FILES['icon_image']['name'])) {
-            $upload = FileUpload::upload($_FILES['icon_image'], 'categories');
-            if ($upload['success']) {
-                if (!empty($category['icon_image'])) {
-                    FileUpload::delete($category['icon_image']);
-                }
-                $updateData['icon_image'] = $upload['path'];
+        try {
+            $category = Category::findById((int) $id);
+            if (!$category) {
+                FlashHelper::error('Kategori tidak ditemukan.');
+                UrlHelper::redirect('/admin/categories');
+                return;
             }
-        }
 
-        Category::updateCategory((int) $id, $updateData);
-        FlashHelper::success('Kategori berhasil diperbarui.');
-        UrlHelper::redirect('/admin/categories');
+            $name = trim($_POST['name'] ?? '');
+            $slug = trim($_POST['slug'] ?? '');
+            $sortOrder = (int) ($_POST['sort_order'] ?? 0);
+            $isActive = isset($_POST['is_active']) ? 1 : 0;
+
+            if (empty($slug)) {
+                $slug = Sanitizer::slugify($name);
+            } else {
+                $slug = Sanitizer::slugify($slug);
+            }
+
+            $updateData = [
+                'name' => $name,
+                'slug' => $slug,
+                'sort_order' => $sortOrder,
+                'is_active' => $isActive,
+            ];
+
+            if (!empty($_FILES['icon_image']['name'])) {
+                $upload = FileUpload::upload($_FILES['icon_image'], 'categories');
+                if ($upload['success']) {
+                    if (!empty($category['icon_image'])) {
+                        FileUpload::delete($category['icon_image']);
+                    }
+                    $updateData['icon_image'] = $upload['path'];
+                } else {
+                    FlashHelper::warning('Gagal upload ikon: ' . $upload['error']);
+                }
+            }
+
+            Category::updateCategory((int) $id, $updateData);
+            FlashHelper::success('Kategori berhasil diperbarui.');
+            UrlHelper::redirect('/admin/categories');
+        } catch (\Throwable $e) {
+            FlashHelper::error('Gagal memperbarui kategori: ' . $e->getMessage());
+            UrlHelper::redirect('/admin/categories/edit/' . (int) $id);
+        }
     }
 
     public function delete(string|int $id): void

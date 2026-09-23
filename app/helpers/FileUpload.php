@@ -42,12 +42,22 @@ class FileUpload
             return ['success' => false, 'error' => 'Ekstensi file tidak didukung. Hanya JPG, PNG, dan WEBP yang diperbolehkan.'];
         }
 
-        // Validate MIME type via finfo
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
+        // Validate MIME type safely (finfo / mime_content_type / getimagesize)
+        $mime = '';
+        if (function_exists('finfo_open')) {
+            $finfo = @finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo) {
+                $mime = @finfo_file($finfo, $file['tmp_name']) ?: '';
+                @finfo_close($finfo);
+            }
+        } elseif (function_exists('mime_content_type')) {
+            $mime = @mime_content_type($file['tmp_name']) ?: '';
+        } elseif (function_exists('getimagesize')) {
+            $imageInfo = @getimagesize($file['tmp_name']);
+            $mime = $imageInfo['mime'] ?? '';
+        }
 
-        if (!in_array($mime, self::$allowedMimes, true)) {
+        if (!empty($mime) && !in_array($mime, self::$allowedMimes, true)) {
             return ['success' => false, 'error' => 'Tipe konten file tidak valid atau bukan gambar yang valid.'];
         }
 
@@ -109,11 +119,18 @@ class FileUpload
             return ['success' => false, 'error' => 'Ekstensi file video tidak didukung. Hanya MP4, WEBM, dan OGG yang diperbolehkan.'];
         }
 
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
+        $mime = '';
+        if (function_exists('finfo_open')) {
+            $finfo = @finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo) {
+                $mime = @finfo_file($finfo, $file['tmp_name']) ?: '';
+                @finfo_close($finfo);
+            }
+        } elseif (function_exists('mime_content_type')) {
+            $mime = @mime_content_type($file['tmp_name']) ?: '';
+        }
 
-        if (!in_array($mime, self::$allowedVideoMimes, true)) {
+        if (!empty($mime) && !in_array($mime, self::$allowedVideoMimes, true)) {
             return ['success' => false, 'error' => 'Tipe konten file bukan video yang valid (' . $mime . ').'];
         }
 
